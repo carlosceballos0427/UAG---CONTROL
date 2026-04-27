@@ -18,31 +18,31 @@ Aplicación web para la gestión y seguimiento financiero de contratos, diseñad
 - **Frontend:** [React](https://reactjs.org/) + [Vite](https://vitejs.dev/)
 - **Estilos:** [Tailwind CSS](https://tailwindcss.com/)
 - **Iconos:** [Lucide React](https://lucide.dev/)
-- **Manejo de Datos:** LocalStorage (Persistencia local) + XLSX (Excel)
+- **Backend:** Python + Django REST Framework
+- **Base de Datos:** SQLite
+- **Manejo de Datos:** Persistencia local, Backend (API) y manipulación de Excel (XLSX).
 
-## 📦 Instalación y Uso
+## 📦 Instalación y Uso (Modo Red Local)
 
-1.  **Clonar el repositorio:**
+1. **Clonar el repositorio:**
     ```bash
     git clone https://github.com/carlosceballos0427/UAG---CONTROL.git
     cd UAG---CONTROL
     ```
 
-2.  **Instalar dependencias:**
-    ```bash
-    npm install
-    ```
+2. **Preparar el entorno:**
+    - Instalar dependencias del Frontend corriendo `npm install` en la raíz.
+    - Configurar el entorno virtual en la carpeta `backend` e instalar dependencias con `pip install django djangorestframework django-cors-headers`.
+    - Ejecutar las migraciones de Django: `python manage.py migrate`.
 
-3.  **Iniciar servidor de desarrollo:**
-    ```bash
-    npm run dev
-    ```
-    La aplicación estará disponible en `http://localhost:5173`.
+3. **Iniciar la aplicación (El "Botón Mágico"):**
+    Para facilitar el trabajo diario en el equipo principal (servidor), ejecuta:
+    👉 **Doble clic en `INICIAR_APP.bat`**
+    Esto iniciará automáticamente tanto el Backend (Puerto 8000) como el Frontend (Puerto 5173 expuesto a la red local) y abrirá el navegador.
 
-4.  **Construir para producción:**
-    ```bash
-    npm run build
-    ```
+4. **Acceso desde otros equipos:**
+    Crea un acceso directo en los otros ordenadores apuntando a la IP del equipo principal.
+    *Ejemplo de URL para el acceso directo:* `http://192.168.1.50:5173`
 
 ## 📋 Funcionalidades Detalladas
 
@@ -56,6 +56,11 @@ Permite editar campos clave del contrato, incluyendo:
 El sistema soporta la carga de archivos Excel (`.xlsx`) estandarizados.
 - Detecta automáticamente **Adiciones** y **Pagos** en columnas específicas.
 - Parsea el historial de pagos detallado ("Cuenta de Cobro N° X").
+
+### Sistema de Autenticación
+- Control de acceso de usuarios mediante Backend (Django REST).
+- Roles de usuario (Administrador, Radicador).
+- UI de Login moderna con visibilidad de contraseña (Botón de ojo) y mensajes de alerta profesionales.
 
 ## 🤝 Contribución
 
