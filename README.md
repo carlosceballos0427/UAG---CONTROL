@@ -72,3 +72,24 @@ El sistema soporta la carga de archivos Excel (`.xlsx`) estandarizados.
 
 ---
 Desarrollado para el seguimiento eficiente de la contratación estatal.
+
+---
+
+## 📖 Contexto Actual de Desarrollo (Bitácora)
+
+*Esta sección contiene el resumen de las últimas configuraciones realizadas en el servidor para no perder el hilo al reiniciar el editor o el equipo.*
+
+**Últimas actualizaciones (Modo Red Local & UI):**
+1. **Configuración de Red Local:**
+   - Frontend: Se configuró para usar `` `http://${window.location.hostname}:8000/api` `` de forma dinámica (ya no depende de `localhost` estático).
+   - Backend: Se ajustó `ALLOWED_HOSTS = ['*']` y `CORS_ALLOW_ALL_ORIGINS = True` en `settings.py` para permitir conexiones desde cualquier IP de la oficina.
+2. **Script de Inicio (Botón Mágico):**
+   - Se creó `INICIAR_APP.bat` en la raíz. Este archivo levanta el backend (`0.0.0.0:8000`), el frontend (`--host` en puerto 5173) y abre el navegador automáticamente tras 5 segundos.
+3. **Mejoras en el Login:**
+   - Interfaz profesional de error para "Credenciales incorrectas".
+   - Integración de botón de "Ver contraseña" (Ojo) en `App.jsx`.
+   - **Nota de acceso:** El usuario administrador actual en la BD es `carlos.admin` con contraseña `admin123`.
+4. **Git y Control de Versiones:**
+   - Se instaló Git mediante `winget`.
+   - Se inicializó el repositorio local, se hizo commit de todos los cambios de red/UI, y se realizó un `push --force` a GitHub para sincronizar la historia desconectada (descarga original como ZIP).
+   - Se forzó la ruta de Git en `.vscode/settings.json` para que el editor reconozca las ramas tras reiniciarse.
