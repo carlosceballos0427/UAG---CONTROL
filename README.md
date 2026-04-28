@@ -80,9 +80,10 @@ Desarrollado para el seguimiento eficiente de la contratación estatal.
 *Esta sección contiene el resumen de las últimas configuraciones realizadas en el servidor para no perder el hilo al reiniciar el editor o el equipo.*
 
 **Últimas actualizaciones (Modo Red Local & UI):**
-1. **Configuración de Red Local:**
-   - Frontend: Se configuró para usar `` `http://${window.location.hostname}:8000/api` `` de forma dinámica (ya no depende de `localhost` estático).
-   - Backend: Se ajustó `ALLOWED_HOSTS = ['*']` y `CORS_ALLOW_ALL_ORIGINS = True` en `settings.py` para permitir conexiones desde cualquier IP de la oficina.
+1. **Configuración de Red Local (Proxy Vite):**
+   - Frontend: Se configuró un proxy en `vite.config.js` (`/api` -> `http://127.0.0.1:8000`). Todas las peticiones `fetch()` en la app ahora usan rutas relativas (`/api/...`).
+   - **Beneficio**: Esto soluciona problemas de conexión desde otros equipos en la red local. Al acceder a la app a través de la IP (ej. `192.168.x.x:5173`), todas las peticiones al backend pasan por el servidor Vite (puerto 5173), evitando que el Firewall de Windows bloquee el acceso al puerto 8000 del backend.
+   - Backend: Se mantiene `ALLOWED_HOSTS = ['*']` y `CORS_ALLOW_ALL_ORIGINS = True` en `settings.py`.
 2. **Script de Inicio (Botón Mágico):**
    - Se creó `INICIAR_APP.bat` en la raíz. Este archivo levanta el backend (`0.0.0.0:8000`), el frontend (`--host` en puerto 5173) y abre el navegador automáticamente tras 5 segundos.
 3. **Mejoras en el Login:**

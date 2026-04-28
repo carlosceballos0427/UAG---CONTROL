@@ -8,7 +8,7 @@ import { getStoredData, deleteEntry, getStoredYears, saveStoredYears, getStoredD
 import { Settings as SettingsIcon, Eye, EyeOff } from 'lucide-react'
 import './styles/App.css'
 
-const API_BASE = `http://${window.location.hostname}:8000/api`;
+const API_BASE = '/api';
 
 function App() {
     const [activeTab, setActiveTab] = useState('dashboard')

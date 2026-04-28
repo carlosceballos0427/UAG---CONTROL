@@ -1,7 +1,7 @@
 // ─── API Client for Django REST Framework ───────────────────────────
 // Replaces the old Data Connect SDK calls with fetch() to our Django API.
 
-const API_BASE = `http://${window.location.hostname}:8000/api`;
+const API_BASE = '/api';
 
 const YEARS_KEY = 'uagcontrol_tracking_years';
 const DEPENDENCIAS_KEY = 'uagcontrol_dependencias';

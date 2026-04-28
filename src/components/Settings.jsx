@@ -23,7 +23,7 @@ const Settings = ({ years, onYearsChange, data, year, onDataImported, dependenci
         if (currentUser?.rol === 'admin') {
             const fetchUsers = async () => {
                 const token = localStorage.getItem('uag_token');
-                const res = await fetch(`http://${window.location.hostname}:8000/api/usuarios/`, {
+                const res = await fetch(`/api/usuarios/`, {
                     headers: { 'Authorization': `Token ${token}` }
                 });
                 if (res.ok) setSystemUsers(await res.json());
@@ -38,7 +38,7 @@ const Settings = ({ years, onYearsChange, data, year, onDataImported, dependenci
         if (newPassword.length < 4) return alert("La contraseña debe tener al menos 4 caracteres");
         
         const token = localStorage.getItem('uag_token');
-        const res = await fetch(`http://${window.location.hostname}:8000/api/usuarios/change_password/`, {
+        const res = await fetch(`/api/usuarios/change_password/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Token ${token}` },
             body: JSON.stringify({ new_password: newPassword })
@@ -60,7 +60,7 @@ const Settings = ({ years, onYearsChange, data, year, onDataImported, dependenci
             return;
         }
         const token = localStorage.getItem('uag_token');
-        const res = await fetch(`http://${window.location.hostname}:8000/api/usuarios/`, {
+        const res = await fetch(`/api/usuarios/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Token ${token}` },
             body: JSON.stringify(newUserState)
@@ -78,7 +78,7 @@ const Settings = ({ years, onYearsChange, data, year, onDataImported, dependenci
     const handleDeleteUser = async (userToDelete) => {
         if (!window.confirm(`¿Seguro que deseas eliminar al usuario ${userToDelete.username}?`)) return;
         const token = localStorage.getItem('uag_token');
-        const res = await fetch(`http://${window.location.hostname}:8000/api/usuarios/${userToDelete.id}/`, {
+        const res = await fetch(`/api/usuarios/${userToDelete.id}/`, {
             method: 'DELETE',
             headers: { 'Authorization': `Token ${token}` }
         });
