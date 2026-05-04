@@ -57,8 +57,7 @@ const ProcessList = ({ data, onEdit, onDelete, userRole = 'radicador' }) => {
                     <thead>
                         <tr className="bg-gray-50">
                             <th className="px-2 py-3 w-[16%] text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">N° Proceso</th>
-                            <th className="px-2 py-3 w-[22%] text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">Objeto / Contratista</th>
-                            <th className="px-2 py-3 w-[7%] text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Tipo</th>
+                            <th className="px-2 py-3 w-[29%] text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">Objeto / Contratista</th>
                             <th className="px-2 py-3 w-[13%] text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider text-right">Valor Total</th>
                             <th className="px-2 py-3 w-[13%] text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider text-right">Pagado</th>
                             <th className="px-2 py-3 w-[13%] text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider text-right">Saldo</th>
@@ -105,10 +104,7 @@ const ProcessList = ({ data, onEdit, onDelete, userRole = 'radicador' }) => {
                                             </div>
                                         </td>
 
-                                        {/* Columna: Tipo de Contrato */}
-                                        <td className="px-2 py-3 text-center overflow-hidden">
-                                            <span className="text-xs text-gray-600">{item['TIPO DE CONTRATO'] || 'N/A'}</span>
-                                        </td>
+                                        {/* Columna: Tipo de Contrato (ELIMINADA) */}
 
                                         {/* Columna: Valor Total */}
                                         <td className="px-2 py-3 text-right overflow-hidden">

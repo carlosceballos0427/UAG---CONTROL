@@ -295,21 +295,16 @@ const DataEntryForm = ({ editingProcess, onCancel, onSaved, initialYear, years, 
                                 <CurrencyInput value={formData['VALOR ADJUDICADO']} onChange={v => handleCurrencyField('VALOR ADJUDICADO', v)} />
                             </div>
                         </div>
-                        <div className="field">
-                            <label>CDP</label>
-                            <div className="currency-input">
-                                <span>$</span>
-                                <CurrencyInput value={formData['CDP']} onChange={v => handleCurrencyField('CDP', v)} />
-                            </div>
-                        </div>
-                        {/* Saldo calculado automáticamente */}
-                        <div className="field bg-gray-50 p-2 rounded-lg border border-gray-100">
-                            <label className="text-gray-500 text-xs font-bold mb-1 uppercase tracking-wider">Saldo por Pagar (Automático)</label>
-                            <div className="text-xl font-black text-emerald-700">
+                        {/* Saldo calculado automáticamente (Reemplaza a CDP) */}
+                        <div className="field bg-emerald-50 p-3 rounded-xl border border-emerald-100 shadow-inner col-span-1">
+                            <label className="text-emerald-700 text-xs font-black mb-1 uppercase tracking-widest flex items-center gap-1">
+                                <Wallet size={14} /> Saldo por Pagar (Automático)
+                            </label>
+                            <div className="text-2xl font-black text-emerald-600">
                                 $ {formatColNumber(formData['SALDO POR PAGAR'] || 0) || '0'}
                             </div>
-                            <div className="text-[10px] text-gray-400 mt-1 italic">
-                                [(Val. Adjudicado + Adiciones) − Total Pagos]
+                            <div className="text-[10px] text-emerald-600/70 mt-1 font-medium">
+                                Val. Adjudicado + Adiciones − Total Pagos
                             </div>
                         </div>
                     </div>
