@@ -52,18 +52,18 @@ const ProcessList = ({ data, onEdit, onDelete, userRole = 'radicador' }) => {
             </div>
 
             {/* ── Tabla de procesos con scroll horizontal ── */}
-            <div className="overflow-x-auto w-full">
-                <table className="w-full text-left border-collapse">
+            <div className="w-full">
+                <table className="w-full text-left border-collapse table-fixed">
                     <thead>
                         <tr className="bg-gray-50">
-                            <th className="px-4 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">N° Proceso</th>
-                            <th className="px-4 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Objeto / Contratista</th>
-                            <th className="px-4 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Tipo</th>
-                            <th className="px-4 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right">Valor Total</th>
-                            <th className="px-4 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right">Pagado</th>
-                            <th className="px-4 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right">Saldo</th>
-                            <th className="px-4 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Estado</th>
-                            <th className="px-4 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Acciones</th>
+                            <th className="px-2 py-3 w-[16%] text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">N° Proceso</th>
+                            <th className="px-2 py-3 w-[22%] text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">Objeto / Contratista</th>
+                            <th className="px-2 py-3 w-[7%] text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Tipo</th>
+                            <th className="px-2 py-3 w-[13%] text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider text-right">Valor Total</th>
+                            <th className="px-2 py-3 w-[13%] text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider text-right">Pagado</th>
+                            <th className="px-2 py-3 w-[13%] text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider text-right">Saldo</th>
+                            <th className="px-2 py-3 w-[8%] text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Estado</th>
+                            <th className="px-2 py-3 w-[8%] text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -89,90 +89,86 @@ const ProcessList = ({ data, onEdit, onDelete, userRole = 'radicador' }) => {
                                 return (
                                     <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                                         {/* Columna: Número de Proceso */}
-                                        <td className="px-4 py-4">
-                                            <span className="font-mono text-sm text-blue-600 font-medium">
+                                        <td className="px-2 py-3 overflow-hidden">
+                                            <span className="font-mono text-xs text-blue-600 font-medium break-all">
                                                 {item['NUMERO DE PROCESO'] || 'N/A'}
                                             </span>
                                         </td>
 
-                                        {/* Columna: Objeto y Contratista (con truncado) */}
-                                        <td className="px-4 py-4">
-                                            <div className="max-w-xs overflow-hidden text-ellipsis whitespace-nowrap font-medium text-gray-900 text-sm" title={item['OBJETO']}>
+                                        {/* Columna: Objeto y Contratista */}
+                                        <td className="px-2 py-3 overflow-hidden">
+                                            <div className="line-clamp-2 font-medium text-gray-900 text-xs mb-1" title={item['OBJETO']}>
                                                 {item['OBJETO'] || 'Sin objeto'}
                                             </div>
-                                            <div className="text-xs text-gray-500">
+                                            <div className="text-[10px] text-gray-500 line-clamp-1" title={item['CONTRATISTA']}>
                                                 {item['CONTRATISTA'] || 'Sin contratista'}
                                             </div>
                                         </td>
 
                                         {/* Columna: Tipo de Contrato */}
-                                        <td className="px-4 py-4 text-center">
-                                            <span className="text-sm text-gray-600">{item['TIPO DE CONTRATO'] || 'N/A'}</span>
+                                        <td className="px-2 py-3 text-center overflow-hidden">
+                                            <span className="text-xs text-gray-600">{item['TIPO DE CONTRATO'] || 'N/A'}</span>
                                         </td>
 
-                                        {/* Columna: Valor Total (alineado a la derecha, fuente monoespaciada) */}
-                                        <td className="px-4 py-4 text-right">
-                                            <span className="font-mono text-sm font-semibold text-gray-900 whitespace-nowrap">
+                                        {/* Columna: Valor Total */}
+                                        <td className="px-2 py-3 text-right overflow-hidden">
+                                            <span className="font-mono text-xs font-semibold text-gray-900 block truncate" title={formatCurrency(totalContrato)}>
                                                 {formatCurrency(totalContrato)}
                                             </span>
                                         </td>
 
-                                        {/* Columna: Total Pagado (alineado a la derecha) */}
-                                        <td className="px-4 py-4 text-right">
-                                            <span className="font-mono text-sm font-medium text-emerald-600 whitespace-nowrap">
+                                        {/* Columna: Total Pagado */}
+                                        <td className="px-2 py-3 text-right overflow-hidden">
+                                            <span className="font-mono text-xs font-medium text-emerald-600 block truncate" title={formatCurrency(totalPagado)}>
                                                 {formatCurrency(totalPagado)}
                                             </span>
                                         </td>
 
-                                        {/* Columna: Saldo por Pagar (alineado a la derecha, color según valor) */}
-                                        <td className="px-4 py-4 text-right">
-                                            <span className={`font-mono text-sm font-semibold whitespace-nowrap ${saldoPorPagar <= 0 ? 'text-green-600' : 'text-amber-600'
-                                                }`}>
+                                        {/* Columna: Saldo por Pagar */}
+                                        <td className="px-2 py-3 text-right overflow-hidden">
+                                            <span className={`font-mono text-xs font-semibold block truncate ${saldoPorPagar <= 0 ? 'text-green-600' : 'text-amber-600'}`} title={formatCurrency(saldoPorPagar)}>
                                                 {formatCurrency(saldoPorPagar)}
                                             </span>
                                         </td>
 
-                                        {/* Columna: Estado (con badge de color según el estado) */}
-                                        <td className="px-4 py-4 text-center">
-                                            <span className={`px-2 py-1 rounded text-xs font-medium whitespace-nowrap ${item['ESTADO'] === 'FINALIZADO' ? 'bg-green-100 text-green-700' :
+                                        {/* Columna: Estado */}
+                                        <td className="px-2 py-3 text-center overflow-hidden">
+                                            <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium block truncate ${item['ESTADO'] === 'FINALIZADO' ? 'bg-green-100 text-green-700' :
                                                 item['ESTADO'] === 'EN PROCESO' ? 'bg-blue-100 text-blue-700' :
                                                     item['ESTADO'] === 'EN EJECUCIÓN' ? 'bg-indigo-100 text-indigo-700' :
                                                         item['ESTADO'] === 'LIQUIDADO' ? 'bg-gray-100 text-gray-700' :
                                                             item['ESTADO'] === 'EMPRÉSTITO' ? 'bg-purple-100 text-purple-700' :
                                                                 item['ESTADO'] === 'SUSPENDIDO' ? 'bg-red-100 text-red-700' :
                                                                     'bg-yellow-100 text-yellow-700'
-                                                }`}>
+                                                }`} title={item['ESTADO'] || 'PENDIENTE'}>
                                                 {item['ESTADO'] || 'PENDIENTE'}
                                             </span>
                                         </td>
 
-                                        {/* Columna: Acciones (Editar / Eliminar) */}
-                                        <td className="px-4 py-4 text-right">
-                                            <div className="flex justify-end gap-2">
-                                                {/* Botón Ver Detalle */}
+                                        {/* Columna: Acciones */}
+                                        <td className="px-2 py-3 text-center">
+                                            <div className="flex justify-center gap-1">
                                                 <button
                                                     onClick={() => setSelectedProcess(item)}
-                                                    className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                                                    className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
                                                     title="Ver Detalle Completo"
                                                 >
-                                                    <Eye size={20} />
+                                                    <Eye size={16} />
                                                 </button>
-                                                {/* Botón editar */}
                                                 <button
                                                     onClick={() => onEdit(item)}
-                                                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                    className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                                     title="Editar"
                                                 >
-                                                    <Edit size={20} />
+                                                    <Edit size={16} />
                                                 </button>
-                                                {/* Botón eliminar */}
                                                 {userRole === 'admin' && (
                                                     <button
                                                         onClick={() => onDelete(item.id)}
-                                                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                        className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                                         title="Eliminar"
                                                     >
-                                                        <Trash2 size={20} />
+                                                        <Trash2 size={16} />
                                                     </button>
                                                 )}
                                             </div>
