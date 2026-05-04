@@ -94,3 +94,9 @@ Desarrollado para el seguimiento eficiente de la contratación estatal.
    - Se instaló Git mediante `winget`.
    - Se inicializó el repositorio local, se hizo commit de todos los cambios de red/UI, y se realizó un `push --force` a GitHub para sincronizar la historia desconectada (descarga original como ZIP).
    - Se forzó la ruta de Git en `.vscode/settings.json` para que el editor reconozca las ramas tras reiniciarse.
+5. **Actualizaciones de Dashboard y UI (Manejo de Empréstitos):**
+   - **Dashboard Diferenciado:** Se excluyeron los procesos con estado "EMPRÉSTITO" de las métricas y gráficas regulares (ya que representan un crédito/ingreso) y se ubicaron en una sección superior exclusiva.
+   - **Corrección de Saldo:** El Dashboard ahora calcula correctamente el "Saldo por Pagar" restando la sumatoria de Cuentas de Cobro ("PAGOS") al valor adjudicado, ignorando el CDP.
+   - **Nuevos Estados:** Se agregaron "EN EJECUCIÓN", "LIQUIDADO" y "EMPRÉSTITO" tanto en el formulario como en el listado, con colores característicos.
+   - **Ajustes de Tabla Responsiva:** Se reestructuró `ProcessList.jsx` aplicando `table-fixed`, removiendo la columna irrelevante "Tipo", y ajustando anchos porcentuales para que toda la tabla quepa en el 100% de la pantalla sin scroll horizontal.
+   - **Formulario:** Se removió el campo manual de "CDP" a favor de darle protagonismo total al cálculo automático de "Saldo por Pagar".
