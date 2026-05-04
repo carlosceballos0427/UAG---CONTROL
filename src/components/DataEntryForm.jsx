@@ -438,8 +438,11 @@ const DataEntryForm = ({ editingProcess, onCancel, onSaved, initialYear, years, 
                             <select name="ESTADO" value={formData['ESTADO']} onChange={handleChange}>
                                 <option value="PENDIENTE">PENDIENTE</option>
                                 <option value="EN PROCESO">EN PROCESO</option>
+                                <option value="EN EJECUCIÓN">EN EJECUCIÓN</option>
                                 <option value="FINALIZADO">FINALIZADO</option>
+                                <option value="LIQUIDADO">LIQUIDADO</option>
                                 <option value="SUSPENDIDO">SUSPENDIDO</option>
+                                <option value="EMPRÉSTITO">EMPRÉSTITO</option>
                             </select>
                         </div>
                     </div>

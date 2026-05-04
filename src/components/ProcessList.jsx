@@ -52,18 +52,18 @@ const ProcessList = ({ data, onEdit, onDelete, userRole = 'radicador' }) => {
             </div>
 
             {/* ── Tabla de procesos con scroll horizontal ── */}
-            <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse" style={{ minWidth: '1000px' }}>
+            <div className="overflow-x-auto w-full">
+                <table className="w-full text-left border-collapse">
                     <thead>
                         <tr className="bg-gray-50">
-                            <th className="px-4 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider" style={{ width: '160px' }}>N° Proceso</th>
+                            <th className="px-4 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">N° Proceso</th>
                             <th className="px-4 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Objeto / Contratista</th>
-                            <th className="px-4 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center" style={{ width: '80px' }}>Tipo</th>
-                            <th className="px-4 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right" style={{ width: '160px' }}>Valor Total</th>
-                            <th className="px-4 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right" style={{ width: '140px' }}>Pagado</th>
-                            <th className="px-4 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right" style={{ width: '140px' }}>Saldo</th>
-                            <th className="px-4 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center" style={{ width: '110px' }}>Estado</th>
-                            <th className="px-4 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right" style={{ width: '90px' }}>Acciones</th>
+                            <th className="px-4 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Tipo</th>
+                            <th className="px-4 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right">Valor Total</th>
+                            <th className="px-4 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right">Pagado</th>
+                            <th className="px-4 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right">Saldo</th>
+                            <th className="px-4 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Estado</th>
+                            <th className="px-4 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -136,8 +136,11 @@ const ProcessList = ({ data, onEdit, onDelete, userRole = 'radicador' }) => {
                                         <td className="px-4 py-4 text-center">
                                             <span className={`px-2 py-1 rounded text-xs font-medium whitespace-nowrap ${item['ESTADO'] === 'FINALIZADO' ? 'bg-green-100 text-green-700' :
                                                 item['ESTADO'] === 'EN PROCESO' ? 'bg-blue-100 text-blue-700' :
-                                                    item['ESTADO'] === 'SUSPENDIDO' ? 'bg-red-100 text-red-700' :
-                                                        'bg-yellow-100 text-yellow-700'
+                                                    item['ESTADO'] === 'EN EJECUCIÓN' ? 'bg-indigo-100 text-indigo-700' :
+                                                        item['ESTADO'] === 'LIQUIDADO' ? 'bg-gray-100 text-gray-700' :
+                                                            item['ESTADO'] === 'EMPRÉSTITO' ? 'bg-purple-100 text-purple-700' :
+                                                                item['ESTADO'] === 'SUSPENDIDO' ? 'bg-red-100 text-red-700' :
+                                                                    'bg-yellow-100 text-yellow-700'
                                                 }`}>
                                                 {item['ESTADO'] || 'PENDIENTE'}
                                             </span>
