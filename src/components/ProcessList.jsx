@@ -1,170 +1,231 @@
 /**
  * ProcessList.jsx
  *
- * Componente que muestra la tabla/listado de todos los procesos contractuales
- * registrados en un año. Incluye columnas de identificación, valores financieros
- * (con alineación a la derecha para montos grandes), estado, y acciones CRUD.
- *
- * Los valores monetarios se formatean con separador de miles colombiano
- * y se alinean a la derecha para facilitar la lectura de cifras grandes.
+ * Componente que muestra la tabla/listado de todos los procesos contractuales.
+ * Diseño UX/UI premium con filtros por estado, búsqueda y tabla responsive.
  */
-import React, { useState } from 'react';
-import { Eye, Edit, Trash2 } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Eye, Edit, Trash2, Search, X, Filter } from 'lucide-react';
 import ProcessDetailModal from './ProcessDetailModal';
 
-/**
- * @component ProcessList
- * @description Renderiza una tabla con todos los procesos del año seleccionado.
- *   Muestra: N° Proceso, Objeto/Contratista, Tipo, Valor Total, Total Pagado,
- *   Saldo por Pagar, Estado, y botones de Editar/Eliminar.
- *
- * @param {Object} props
- * @param {Array} props.data - Array de objetos de proceso (del LocalStorage).
- * @param {Function} props.onEdit - Callback al hacer clic en "Editar" (recibe el proceso).
- * @param {Function} props.onDelete - Callback al hacer clic en "Eliminar" (recibe el id).
- */
-const ProcessList = ({ data, onEdit, onDelete, userRole = 'radicador' }) => {
+// ─── Estados con estilos ──────────────────────────────────────────
+const ESTADO_STYLES = {
+    'TERMINADO':    { bg: 'bg-green-100',   text: 'text-green-700',   dot: 'bg-green-500' },
+    'EN PROCESO':   { bg: 'bg-blue-100',    text: 'text-blue-700',    dot: 'bg-blue-500' },
+    'EN EJECUCIÓN': { bg: 'bg-indigo-100',  text: 'text-indigo-700',  dot: 'bg-indigo-500' },
+    'LIQUIDADO':    { bg: 'bg-gray-200',    text: 'text-gray-700',    dot: 'bg-gray-500' },
+    'EMPRÉSTITO':   { bg: 'bg-purple-100',  text: 'text-purple-700',  dot: 'bg-purple-500' },
+    'SUSPENDIDO':   { bg: 'bg-red-100',     text: 'text-red-700',     dot: 'bg-red-500' },
+    'PENDIENTE':    { bg: 'bg-yellow-100',  text: 'text-yellow-700',  dot: 'bg-yellow-500' },
+};
+const getEstadoStyle = (e) => ESTADO_STYLES[e] || ESTADO_STYLES['PENDIENTE'];
 
-    /**
-     * @function formatCurrency
-     * @description Formatea un número como moneda colombiana con separador de miles.
-     *   Ejemplo: 2350000000 → "$ 2.350.000.000"
-     * @param {number} value - Valor numérico a formatear.
-     * @returns {string} Valor formateado con signo $ y separadores de miles.
-     */
-    const formatCurrency = (value) => {
-        return `$ ${new Intl.NumberFormat('es-CO', {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
-        }).format(value || 0)}`;
-    };
+const ProcessList = ({ data, onEdit, onDelete, userRole = 'radicador' }) => {
+    const fmt = (v) => `$ ${new Intl.NumberFormat('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(v || 0)}`;
 
     const [selectedProcess, setSelectedProcess] = useState(null);
+    const [filterEstado, setFilterEstado] = useState(null);
+    const [searchText, setSearchText] = useState('');
+
+    const estadoCounts = useMemo(() => {
+        const c = {};
+        data.forEach(i => { const e = i['ESTADO'] || 'PENDIENTE'; c[e] = (c[e] || 0) + 1; });
+        return c;
+    }, [data]);
+
+    const filteredData = useMemo(() => {
+        let r = data;
+        if (filterEstado) r = r.filter(i => (i['ESTADO'] || 'PENDIENTE') === filterEstado);
+        if (searchText.trim()) {
+            const q = searchText.toLowerCase().trim();
+            r = r.filter(i =>
+                (i['NUMERO DE PROCESO'] || '').toLowerCase().includes(q) ||
+                (i['CONTRATISTA'] || '').toLowerCase().includes(q) ||
+                (i['OBJETO'] || '').toLowerCase().includes(q) ||
+                (i['SUPERVISOR'] || '').toLowerCase().includes(q)
+            );
+        }
+        return r;
+    }, [data, filterEstado, searchText]);
+
+    const estadosPresentes = useMemo(() => {
+        return ['PENDIENTE', 'EN PROCESO', 'EN EJECUCIÓN', 'TERMINADO', 'LIQUIDADO', 'SUSPENDIDO', 'EMPRÉSTITO'].filter(e => estadoCounts[e] > 0);
+    }, [estadoCounts]);
 
     return (
         <div className="card mt-8 overflow-hidden">
-            {/* ── Encabezado con título y contador de procesos ── */}
-            <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-                <h2 className="text-xl font-bold text-gray-800">Listado de Procesos</h2>
-                <span className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-sm font-medium">
-                    {data.length} Procesos
-                </span>
+            {/* ── Header con filtros ── */}
+            <div className="p-5 pb-4 border-b border-gray-100">
+                <div className="flex justify-between items-center mb-3">
+                    <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                        <Filter size={18} className="text-blue-500" /> Listado de Procesos
+                    </h2>
+                    <span className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-xs font-bold">
+                        {filteredData.length} de {data.length}
+                    </span>
+                </div>
+
+                {/* Búsqueda */}
+                <div className="relative mb-3">
+                    <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input
+                        type="text"
+                        value={searchText}
+                        onChange={(e) => setSearchText(e.target.value)}
+                        placeholder="Buscar por N° proceso, contratista, objeto o supervisor..."
+                        className="w-full pl-9 pr-9 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all bg-gray-50/80 hover:bg-white"
+                    />
+                    {searchText && (
+                        <button onClick={() => setSearchText('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                            <X size={15} />
+                        </button>
+                    )}
+                </div>
+
+                {/* Filtros por estado */}
+                <div className="flex flex-wrap gap-1.5">
+                    <button
+                        onClick={() => setFilterEstado(null)}
+                        className={`px-2.5 py-1 rounded-full text-[10px] font-bold transition-all ${
+                            !filterEstado ? 'bg-gray-800 text-white shadow-sm' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                        }`}
+                    >
+                        TODOS ({data.length})
+                    </button>
+                    {estadosPresentes.map(estado => {
+                        const s = getEstadoStyle(estado);
+                        const active = filterEstado === estado;
+                        return (
+                            <button
+                                key={estado}
+                                onClick={() => setFilterEstado(active ? null : estado)}
+                                className={`px-2.5 py-1 rounded-full text-[10px] font-bold transition-all flex items-center gap-1 ${
+                                    active
+                                        ? `${s.bg} ${s.text} shadow-sm ring-2 ring-offset-1 ring-current`
+                                        : `${s.bg} ${s.text} opacity-75 hover:opacity-100`
+                                }`}
+                            >
+                                <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`}></span>
+                                {estado} ({estadoCounts[estado]})
+                            </button>
+                        );
+                    })}
+                </div>
             </div>
 
-            {/* ── Tabla de procesos con scroll horizontal ── */}
+            {/* ── Tabla ── */}
             <div className="w-full">
                 <table className="w-full text-left border-collapse table-fixed">
                     <thead>
-                        <tr className="bg-gray-50">
-                            <th className="px-2 py-3 w-[16%] text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">N° Proceso</th>
-                            <th className="px-2 py-3 w-[29%] text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">Objeto / Contratista</th>
-                            <th className="px-2 py-3 w-[13%] text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider text-right">Valor Total</th>
-                            <th className="px-2 py-3 w-[13%] text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider text-right">Pagado</th>
-                            <th className="px-2 py-3 w-[13%] text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider text-right">Saldo</th>
-                            <th className="px-2 py-3 w-[8%] text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Estado</th>
-                            <th className="px-2 py-3 w-[8%] text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Acciones</th>
+                        <tr className="bg-gradient-to-r from-slate-50 to-gray-50">
+                            <th className="pl-4 pr-2 py-3 w-[15%] text-[10px] font-bold text-gray-400 uppercase tracking-wider">N° Proceso</th>
+                            <th className="px-2 py-3 w-[27%] text-[10px] font-bold text-gray-400 uppercase tracking-wider">Objeto / Contratista</th>
+                            <th className="px-2 py-3 w-[10%] text-[10px] font-bold text-gray-400 uppercase tracking-wider text-right">Valor Total</th>
+                            <th className="px-2 py-3 w-[10%] text-[10px] font-bold text-gray-400 uppercase tracking-wider text-right">Pagado</th>
+                            <th className="px-2 py-3 w-[10%] text-[10px] font-bold text-gray-400 uppercase tracking-wider text-right">Saldo</th>
+                            <th className="px-2 py-3 w-[11%] text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">Estado</th>
+                            <th className="px-1 py-3 w-[7%] text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">SECOP</th>
+                            <th className="px-1 py-3 w-[10%] text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
-                        {data.length === 0 ? (
-                            /* Mensaje cuando no hay procesos registrados */
+                    <tbody className="divide-y divide-gray-50">
+                        {filteredData.length === 0 ? (
                             <tr>
-                                <td colSpan="8" className="px-6 py-12 text-center text-gray-500 italic">
-                                    No hay procesos registrados para este año.
+                                <td colSpan="8" className="px-6 py-12 text-center text-gray-400 italic text-sm">
+                                    {data.length === 0 ? 'No hay procesos registrados para este año.' : 'No se encontraron procesos con los filtros aplicados.'}
                                 </td>
                             </tr>
                         ) : (
-                            data.map((item) => {
-                                /* Cálculos financieros por fila */
-                                const adicionesTotal = (item['ADICIONES'] || []).reduce(
-                                    (sum, adj) => sum + (parseFloat(adj.valor) || 0), 0
-                                );
-                                const totalContrato = (parseFloat(item['VALOR ADJUDICADO']) || 0) + adicionesTotal;
-                                const totalPagado = (item['PAGOS'] || []).reduce(
-                                    (sum, p) => sum + (parseFloat(p.valor) || 0), 0
-                                );
-                                const saldoPorPagar = totalContrato - totalPagado;
+                            filteredData.map((item) => {
+                                const adT = (item['ADICIONES'] || []).reduce((s, a) => s + (parseFloat(a.valor) || 0), 0);
+                                const tC = (parseFloat(item['VALOR ADJUDICADO']) || 0) + adT;
+                                const tP = (item['PAGOS'] || []).reduce((s, p) => s + (parseFloat(p.valor) || 0), 0);
+                                const saldo = tC - tP;
+                                const estado = item['ESTADO'] || 'PENDIENTE';
+                                const st = getEstadoStyle(estado);
 
                                 return (
-                                    <tr key={item.id} className="hover:bg-gray-50 transition-colors">
-                                        {/* Columna: Número de Proceso */}
-                                        <td className="px-2 py-3 overflow-hidden">
-                                            <span className="font-mono text-xs text-blue-600 font-medium break-all">
+                                    <tr key={item.id} className="hover:bg-blue-50/30 transition-colors duration-100 group">
+                                        {/* N° Proceso */}
+                                        <td className="pl-4 pr-2 py-2.5">
+                                            <span className="font-mono text-[11px] text-blue-600 font-semibold block truncate" title={item['NUMERO DE PROCESO'] || 'N/A'}>
                                                 {item['NUMERO DE PROCESO'] || 'N/A'}
                                             </span>
                                         </td>
 
-                                        {/* Columna: Objeto y Contratista */}
-                                        <td className="px-2 py-3 overflow-hidden">
-                                            <div className="line-clamp-2 font-medium text-gray-900 text-xs mb-1" title={item['OBJETO']}>
+                                        {/* Objeto / Contratista */}
+                                        <td className="px-2 py-2.5">
+                                            <div className="truncate font-medium text-gray-800 text-[11px] leading-tight" title={item['OBJETO']}>
                                                 {item['OBJETO'] || 'Sin objeto'}
                                             </div>
-                                            <div className="text-[10px] text-gray-500 line-clamp-1" title={item['CONTRATISTA']}>
+                                            <div className="truncate text-[10px] text-gray-400 leading-tight mt-0.5" title={item['CONTRATISTA']}>
                                                 {item['CONTRATISTA'] || 'Sin contratista'}
                                             </div>
                                         </td>
 
-                                        {/* Columna: Tipo de Contrato (ELIMINADA) */}
-
-                                        {/* Columna: Valor Total */}
-                                        <td className="px-2 py-3 text-right overflow-hidden">
-                                            <span className="font-mono text-xs font-semibold text-gray-900 block truncate" title={formatCurrency(totalContrato)}>
-                                                {formatCurrency(totalContrato)}
+                                        {/* Valor Total */}
+                                        <td className="px-2 py-2.5 text-right">
+                                            <span className="font-mono text-[11px] font-semibold text-gray-800 truncate block" title={fmt(tC)}>
+                                                {fmt(tC)}
                                             </span>
                                         </td>
 
-                                        {/* Columna: Total Pagado */}
-                                        <td className="px-2 py-3 text-right overflow-hidden">
-                                            <span className="font-mono text-xs font-medium text-emerald-600 block truncate" title={formatCurrency(totalPagado)}>
-                                                {formatCurrency(totalPagado)}
+                                        {/* Total Pagado */}
+                                        <td className="px-2 py-2.5 text-right">
+                                            <span className="font-mono text-[11px] font-medium text-emerald-600 truncate block" title={fmt(tP)}>
+                                                {fmt(tP)}
                                             </span>
                                         </td>
 
-                                        {/* Columna: Saldo por Pagar */}
-                                        <td className="px-2 py-3 text-right overflow-hidden">
-                                            <span className={`font-mono text-xs font-semibold block truncate ${saldoPorPagar <= 0 ? 'text-green-600' : 'text-amber-600'}`} title={formatCurrency(saldoPorPagar)}>
-                                                {formatCurrency(saldoPorPagar)}
+                                        {/* Saldo */}
+                                        <td className="px-2 py-2.5 text-right">
+                                            <span className={`font-mono text-[11px] font-semibold truncate block ${saldo <= 0 ? 'text-green-600' : 'text-amber-600'}`} title={fmt(saldo)}>
+                                                {fmt(saldo)}
                                             </span>
                                         </td>
 
-                                        {/* Columna: Estado */}
-                                        <td className="px-2 py-3 text-center overflow-hidden">
-                                            <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium block truncate ${item['ESTADO'] === 'FINALIZADO' ? 'bg-green-100 text-green-700' :
-                                                item['ESTADO'] === 'EN PROCESO' ? 'bg-blue-100 text-blue-700' :
-                                                    item['ESTADO'] === 'EN EJECUCIÓN' ? 'bg-indigo-100 text-indigo-700' :
-                                                        item['ESTADO'] === 'LIQUIDADO' ? 'bg-gray-100 text-gray-700' :
-                                                            item['ESTADO'] === 'EMPRÉSTITO' ? 'bg-purple-100 text-purple-700' :
-                                                                item['ESTADO'] === 'SUSPENDIDO' ? 'bg-red-100 text-red-700' :
-                                                                    'bg-yellow-100 text-yellow-700'
-                                                }`} title={item['ESTADO'] || 'PENDIENTE'}>
-                                                {item['ESTADO'] || 'PENDIENTE'}
+                                        {/* Estado */}
+                                        <td className="px-2 py-2.5 text-center">
+                                            <span className={`inline-block px-2 py-0.5 rounded-md text-[9px] font-bold tracking-wide ${st.bg} ${st.text}`} title={estado}>
+                                                {estado}
                                             </span>
                                         </td>
 
-                                        {/* Columna: Acciones */}
-                                        <td className="px-2 py-3 text-center">
-                                            <div className="flex justify-center gap-1">
-                                                <button
-                                                    onClick={() => setSelectedProcess(item)}
-                                                    className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
-                                                    title="Ver Detalle Completo"
+                                        {/* SECOP */}
+                                        <td className="px-1 py-2.5 text-center">
+                                            {item['LINK_SECOP'] ? (
+                                                <a
+                                                    href={item['LINK_SECOP']}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="secop-badge"
+                                                    title={`Abrir en SECOP: ${item['LINK_SECOP']}`}
                                                 >
-                                                    <Eye size={16} />
+                                                    <span className="secop-badge-inner">
+                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="secop-icon">
+                                                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                                            <polyline points="9 12 11 14 15 10"/>
+                                                        </svg>
+                                                        <span className="secop-label">SECOP</span>
+                                                    </span>
+                                                </a>
+                                            ) : (
+                                                <span className="text-gray-200 text-[10px]">—</span>
+                                            )}
+                                        </td>
+
+                                        {/* Acciones */}
+                                        <td className="px-1 py-2.5 text-center">
+                                            <div className="flex justify-center gap-0.5">
+                                                <button onClick={() => setSelectedProcess(item)} className="p-1 text-emerald-500 hover:bg-emerald-50 rounded-md transition-colors" title="Ver Detalle">
+                                                    <Eye size={15} />
                                                 </button>
-                                                <button
-                                                    onClick={() => onEdit(item)}
-                                                    className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                                    title="Editar"
-                                                >
-                                                    <Edit size={16} />
+                                                <button onClick={() => onEdit(item)} className="p-1 text-blue-500 hover:bg-blue-50 rounded-md transition-colors" title="Editar">
+                                                    <Edit size={15} />
                                                 </button>
                                                 {userRole === 'admin' && (
-                                                    <button
-                                                        onClick={() => onDelete(item.id)}
-                                                        className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                                        title="Eliminar"
-                                                    >
-                                                        <Trash2 size={16} />
+                                                    <button onClick={() => onDelete(item.id)} className="p-1 text-red-400 hover:bg-red-50 rounded-md transition-colors" title="Eliminar">
+                                                        <Trash2 size={15} />
                                                     </button>
                                                 )}
                                             </div>
@@ -177,17 +238,11 @@ const ProcessList = ({ data, onEdit, onDelete, userRole = 'radicador' }) => {
                 </table>
             </div>
 
-
-            {/* Modal de Detalle */}
-            {
-                selectedProcess && (
-                    <ProcessDetailModal
-                        process={selectedProcess}
-                        onClose={() => setSelectedProcess(null)}
-                    />
-                )
-            }
-        </div >
+            {/* Modal */}
+            {selectedProcess && (
+                <ProcessDetailModal process={selectedProcess} onClose={() => setSelectedProcess(null)} />
+            )}
+        </div>
     );
 };
 

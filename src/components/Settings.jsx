@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Settings as SettingsIcon, Plus, Trash2, Calendar, Upload, Download, FileSpreadsheet, BarChart3, CheckCircle, AlertCircle, Loader2, Building2, Users } from 'lucide-react';
+import { Settings as SettingsIcon, Plus, Trash2, Calendar, Upload, Download, FileSpreadsheet, BarChart3, CheckCircle, AlertCircle, Loader2, Building2, Users, Key } from 'lucide-react';
 import { importExcel, exportToExcel, exportToCSV } from '../utils/excelIO';
 
 /**
@@ -18,6 +18,7 @@ const Settings = ({ years, onYearsChange, data, year, onDataImported, dependenci
 
     const [systemUsers, setSystemUsers] = useState([]);
     const [newUserState, setNewUserState] = useState({ username: '', email: '', password: '', rol: 'radicador' });
+    const [resetPasswordState, setResetPasswordState] = useState({ userId: null, newPassword: '' });
 
     useEffect(() => {
         if (currentUser?.rol === 'admin') {
@@ -84,6 +85,23 @@ const Settings = ({ years, onYearsChange, data, year, onDataImported, dependenci
         });
         if (res.ok) {
             setSystemUsers(systemUsers.filter(u => u.id !== userToDelete.id));
+        }
+    };
+
+    const handleAdminResetPassword = async (userId) => {
+        if (!resetPasswordState.newPassword) return alert("Ingresa una nueva contraseña");
+        if (resetPasswordState.newPassword.length < 4) return alert("La contraseña debe tener al menos 4 caracteres");
+        const token = localStorage.getItem('uag_token');
+        const res = await fetch(`/api/usuarios/${userId}/admin_reset_password/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Token ${token}` },
+            body: JSON.stringify({ new_password: resetPasswordState.newPassword })
+        });
+        if (res.ok) {
+            alert("Contraseña actualizada exitosamente.");
+            setResetPasswordState({ userId: null, newPassword: '' });
+        } else {
+            alert("Error al actualizar la contraseña.");
         }
     };
 
@@ -308,15 +326,50 @@ const Settings = ({ years, onYearsChange, data, year, onDataImported, dependenci
                                     <span className="text-sm font-bold text-gray-800">{u.username}</span>
                                     <span className="text-xs text-gray-400 uppercase tracking-widest">{u.rol}</span>
                                 </div>
-                                {u.username !== currentUser?.username && (
-                                <button
-                                    onClick={() => handleDeleteUser(u)}
-                                    className="text-red-400 hover:text-red-600 p-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white rounded-lg shadow-sm"
-                                    title="Eliminar usuario"
-                                >
-                                    <Trash2 size={16} />
-                                </button>
-                                )}
+                                
+                                <div className="flex items-center gap-2">
+                                    {resetPasswordState.userId === u.id ? (
+                                        <div className="flex items-center gap-2 bg-white p-1 rounded-lg shadow-sm border border-gray-200">
+                                            <input 
+                                                type="text" 
+                                                placeholder="Nueva clave" 
+                                                className="text-sm border-none bg-gray-50 rounded px-2 py-1 w-28 focus:ring-1 focus:ring-indigo-500"
+                                                value={resetPasswordState.newPassword}
+                                                onChange={e => setResetPasswordState({...resetPasswordState, newPassword: e.target.value})}
+                                            />
+                                            <button 
+                                                onClick={() => handleAdminResetPassword(u.id)}
+                                                className="text-xs bg-indigo-600 text-white px-2 py-1 rounded font-bold hover:bg-indigo-700"
+                                            >
+                                                Guardar
+                                            </button>
+                                            <button 
+                                                onClick={() => setResetPasswordState({ userId: null, newPassword: '' })}
+                                                className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded font-bold hover:bg-gray-300"
+                                            >
+                                                Cancelar
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <button
+                                            onClick={() => setResetPasswordState({ userId: u.id, newPassword: '' })}
+                                            className="text-indigo-400 hover:text-indigo-600 p-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white rounded-lg shadow-sm"
+                                            title="Cambiar contraseña"
+                                        >
+                                            <Key size={16} />
+                                        </button>
+                                    )}
+
+                                    {u.username !== currentUser?.username && (
+                                    <button
+                                        onClick={() => handleDeleteUser(u)}
+                                        className="text-red-400 hover:text-red-600 p-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white rounded-lg shadow-sm"
+                                        title="Eliminar usuario"
+                                    >
+                                        <Trash2 size={16} />
+                                    </button>
+                                    )}
+                                </div>
                             </div>
                         ))}
                     </div>

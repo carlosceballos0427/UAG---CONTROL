@@ -21,6 +21,20 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         user.save()
         return Response({"success": "Contraseña actualizada"})
 
+    @action(detail=True, methods=['post'])
+    def admin_reset_password(self, request, pk=None):
+        if request.user.rol != 'admin':
+            return Response({"error": "No autorizado"}, status=status.HTTP_403_FORBIDDEN)
+        
+        user = self.get_object()
+        new_password = request.data.get('new_password')
+        if not new_password:
+            return Response({"error": "Nueva contraseña requerida"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user.set_password(new_password)
+        user.save()
+        return Response({"success": f"Contraseña actualizada para {user.username}"})
+
 class ProcesoViewSet(viewsets.ModelViewSet):
     serializer_class = ProcesoSerializer
 

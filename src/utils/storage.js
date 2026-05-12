@@ -90,6 +90,7 @@ export const getStoredData = async (year) => {
             'SUPERVISOR': p.supervisor || '',
             'APOYO A LA SUPERVISIÓN': p.apoyo_supervision || '',
             'CONTRATISTA': p.contratista || '',
+            'LINK_SECOP': p.link_secop || '',
             'ADICIONES': p.adiciones?.map(a => ({ id: a.id, descripcion: a.descripcion, valor: a.valor })) || [],
             'PAGOS': p.pagos?.map(pg => ({ id: pg.id, periodo: pg.periodo, fecha: pg.fecha, valor: pg.valor })) || [],
             'CREADO_POR': p.creado_por_detail?.email || ''
@@ -121,7 +122,8 @@ export const addEntry = async (year, entry) => {
                 estado: entry['ESTADO'],
                 supervisor: entry['SUPERVISOR'],
                 apoyo_supervision: entry['APOYO A LA SUPERVISIÓN'],
-                contratista: entry['CONTRATISTA']
+                contratista: entry['CONTRATISTA'],
+                link_secop: entry['LINK_SECOP'] || '',
             }),
         });
 
@@ -186,7 +188,8 @@ export const updateEntry = async (year, entry) => {
                 estado: entry['ESTADO'],
                 supervisor: entry['SUPERVISOR'],
                 apoyo_supervision: entry['APOYO A LA SUPERVISIÓN'],
-                contratista: entry['CONTRATISTA']
+                contratista: entry['CONTRATISTA'],
+                link_secop: entry['LINK_SECOP'] || '',
             }),
         });
 

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     PieChart, Pie, Cell, Legend,
@@ -6,14 +6,62 @@ import {
 } from 'recharts';
 import { LayoutDashboard, CheckCircle, Clock, DollarSign, Wallet, Building2, Landmark } from 'lucide-react';
 
+// ─── Tooltip personalizado para el Pie Chart ──────────────────────
+const CustomPieTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+        const { name, value, percent } = payload[0];
+        return (
+            <div className="bg-white px-4 py-3 rounded-2xl shadow-xl border border-gray-100">
+                <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">{name}</div>
+                <div className="text-lg font-black text-gray-900">{value} procesos</div>
+                <div className="text-xs text-gray-400 mt-0.5">{(percent * 100).toFixed(1)}% del total</div>
+            </div>
+        );
+    }
+    return null;
+};
+
+// ─── Tooltip personalizado para el Bar Chart ──────────────────────
+const CustomBarTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+        return (
+            <div className="bg-white px-4 py-3 rounded-2xl shadow-xl border border-gray-100">
+                <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">{label}</div>
+                <div className="text-lg font-black text-purple-700">{payload[0].value} procesos</div>
+            </div>
+        );
+    }
+    return null;
+};
+
+// ─── Tooltip personalizado para el Line Chart ─────────────────────
+const CustomLineTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+        return (
+            <div className="bg-white px-4 py-3 rounded-2xl shadow-xl border border-gray-100">
+                <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">{label}</div>
+                <div className="text-lg font-black text-blue-700">
+                    ${new Intl.NumberFormat('es-CO').format(payload[0].value)}
+                </div>
+                <div className="text-[10px] text-gray-400 mt-0.5">Ejecución del mes</div>
+            </div>
+        );
+    }
+    return null;
+};
+
 const Dashboard = ({ data, year, setYear, years }) => {
     const mainData = useMemo(() => data.filter(d => d.ESTADO !== 'EMPRÉSTITO'), [data]);
     const emprestitoData = useMemo(() => data.filter(d => d.ESTADO === 'EMPRÉSTITO'), [data]);
 
     const metrics = useMemo(() => {
         const totalProcesos = mainData.length;
-        const completados = mainData.filter(d => d.ESTADO === 'FINALIZADO').length;
+        const terminados = mainData.filter(d => d.ESTADO === 'TERMINADO').length;
         const enProceso = mainData.filter(d => d.ESTADO === 'EN PROCESO').length;
+        const enEjecucion = mainData.filter(d => d.ESTADO === 'EN EJECUCIÓN').length;
+        const pendientes = mainData.filter(d => d.ESTADO === 'PENDIENTE' || !d.ESTADO).length;
+        const liquidados = mainData.filter(d => d.ESTADO === 'LIQUIDADO').length;
+        const suspendidos = mainData.filter(d => d.ESTADO === 'SUSPENDIDO').length;
 
         const presupuestoTotal = mainData.reduce((acc, d) => acc + (parseFloat(d['PRESUPUESTO ESTIMADO']) || 0), 0);
         const valorAdjudicado = mainData.reduce((acc, d) => {
@@ -28,13 +76,28 @@ const Dashboard = ({ data, year, setYear, years }) => {
         const saldoTotal = valorAdjudicado - totalPagado;
 
         return [
-            { label: 'Procesos Totales', value: totalProcesos, icon: <LayoutDashboard size={20} />, color: '#6366f1' },
-            { label: 'Finalizados', value: completados, icon: <CheckCircle size={20} />, color: '#10b981' },
-            { label: 'Presupuesto Estimado', value: `$ ${new Intl.NumberFormat('es-CO').format(presupuestoTotal)}`, icon: <DollarSign size={20} />, color: '#8b5cf6' },
-            { label: 'Valor Adjudicado + Adic.', value: `$ ${new Intl.NumberFormat('es-CO').format(valorAdjudicado)}`, icon: <Wallet size={20} />, color: '#3b82f6' },
-            { label: 'Saldo por Pagar', value: `$ ${new Intl.NumberFormat('es-CO').format(saldoTotal)}`, icon: <Clock size={20} />, color: '#f59e0b' },
+            {
+                label: 'Procesos Totales', value: totalProcesos, icon: <LayoutDashboard size={20} />, color: '#6366f1',
+                tooltip: `Pendientes: ${pendientes} | En Proceso: ${enProceso} | En Ejecución: ${enEjecucion} | Terminados: ${terminados} | Liquidados: ${liquidados} | Suspendidos: ${suspendidos}`
+            },
+            {
+                label: 'Terminados', value: terminados, icon: <CheckCircle size={20} />, color: '#10b981',
+                tooltip: `${totalProcesos > 0 ? ((terminados / totalProcesos) * 100).toFixed(1) : 0}% del total de procesos`
+            },
+            {
+                label: 'Presupuesto Estimado', value: `$ ${new Intl.NumberFormat('es-CO').format(presupuestoTotal)}`, icon: <DollarSign size={20} />, color: '#8b5cf6',
+                tooltip: `Presupuesto estimado total para el año ${year}`
+            },
+            {
+                label: 'Valor Adjudicado + Adic.', value: `$ ${new Intl.NumberFormat('es-CO').format(valorAdjudicado)}`, icon: <Wallet size={20} />, color: '#3b82f6',
+                tooltip: `Total pagado: $${new Intl.NumberFormat('es-CO').format(totalPagado)} (${valorAdjudicado > 0 ? ((totalPagado / valorAdjudicado) * 100).toFixed(1) : 0}% ejecutado)`
+            },
+            {
+                label: 'Saldo por Pagar', value: `$ ${new Intl.NumberFormat('es-CO').format(saldoTotal)}`, icon: <Clock size={20} />, color: '#f59e0b',
+                tooltip: `Pendiente de ejecución financiera`
+            },
         ];
-    }, [mainData]);
+    }, [mainData, year]);
 
     const emprestitoMetrics = useMemo(() => {
         const total = emprestitoData.length;
@@ -70,7 +133,6 @@ const Dashboard = ({ data, year, setYear, years }) => {
         const normalize = (str) => {
             if (!str) return 'SIN DEFINIR';
             let s = str.toString().trim().toUpperCase();
-            // Normalizar acentos y abreviaturas comunes
             s = s.replace('CONTRATACION', 'CONTRATACIÓN');
             s = s.replace('MINIMA', 'MÍNIMA');
             s = s.replace('CUANTIA', 'CUANTÍA');
@@ -92,6 +154,9 @@ const Dashboard = ({ data, year, setYear, years }) => {
     }, [mainData]);
 
     const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#6366f1', '#6b7280', '#ec4899', '#8b5cf6'];
+
+    // ─── Hover tooltip state para tarjetas ────────────────────────
+    const [hoveredCard, setHoveredCard] = useState(null);
 
     return (
         <div className="dashboard-root animate-fade-in">
@@ -132,18 +197,31 @@ const Dashboard = ({ data, year, setYear, years }) => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
                 {metrics.map((m, i) => {
-                    // Determinar tamaño de fuente según longitud del valor
                     const valueStr = String(m.value);
                     const fontSize = valueStr.length > 18 ? 'text-sm' : valueStr.length > 12 ? 'text-base' : 'text-xl';
 
                     return (
-                        <div key={i} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative overflow-hidden group flex flex-col justify-between min-h-[130px]">
+                        <div
+                            key={i}
+                            className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition-all relative overflow-hidden group flex flex-col justify-between min-h-[130px] cursor-default"
+                            onMouseEnter={() => setHoveredCard(i)}
+                            onMouseLeave={() => setHoveredCard(null)}
+                        >
                             <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity" style={{ color: m.color }}>
                                 {m.icon}
                             </div>
                             <span className="text-xs font-bold text-gray-400 uppercase tracking-widest leading-tight min-h-[28px]">{m.label}</span>
                             <div className={`mt-2 ${fontSize} font-black text-gray-900 break-all leading-tight`} title={valueStr}>{m.value}</div>
                             <div className="h-1 w-12 mt-4 rounded-full" style={{ backgroundColor: m.color }}></div>
+
+                            {/* Tooltip al hover */}
+                            {hoveredCard === i && m.tooltip && (
+                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 bg-gray-900 text-white text-[11px] px-4 py-2.5 rounded-xl shadow-2xl whitespace-nowrap animate-fade-in pointer-events-none max-w-[350px] text-center leading-relaxed"
+                                     style={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
+                                    {m.tooltip}
+                                    <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-transparent border-t-gray-900"></div>
+                                </div>
+                            )}
                         </div>
                     );
                 })}
@@ -160,10 +238,7 @@ const Dashboard = ({ data, year, setYear, years }) => {
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 600 }} dy={10} />
                                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} tickFormatter={(value) => `$${value / 1000000}M`} />
-                                <Tooltip
-                                    contentStyle={{ background: '#fff', border: 'none', borderRadius: '16px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
-                                    formatter={(value) => [`$${new Intl.NumberFormat('es-CO').format(value)}`, 'Ejecución']}
-                                />
+                                <Tooltip content={<CustomLineTooltip />} />
                                 <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={4} dot={{ r: 6, fill: '#fff', stroke: '#3b82f6', strokeWidth: 3 }} activeDot={{ r: 8, fill: '#3b82f6', stroke: '#fff', strokeWidth: 2 }} />
                             </LineChart>
                         </ResponsiveContainer>
@@ -187,7 +262,7 @@ const Dashboard = ({ data, year, setYear, years }) => {
                                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} cornerRadius={4} />
                                         ))}
                                     </Pie>
-                                    <Tooltip />
+                                    <Tooltip content={<CustomPieTooltip />} />
                                     <Legend verticalAlign="bottom" height={36} />
                                 </PieChart>
                             </ResponsiveContainer>
@@ -210,10 +285,7 @@ const Dashboard = ({ data, year, setYear, years }) => {
                                 <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#f1f5f9" />
                                 <XAxis type="number" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
                                 <YAxis dataKey="name" type="category" width={150} axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b', fontWeight: 600 }} />
-                                <Tooltip
-                                    cursor={{ fill: '#f8fafc' }}
-                                    contentStyle={{ background: '#fff', border: 'none', borderRadius: '12px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
-                                />
+                                <Tooltip content={<CustomBarTooltip />} cursor={{ fill: '#f8fafc' }} />
                                 <Bar dataKey="value" fill="#8b5cf6" radius={[0, 4, 4, 0]} barSize={20} />
                             </BarChart>
                         </ResponsiveContainer>

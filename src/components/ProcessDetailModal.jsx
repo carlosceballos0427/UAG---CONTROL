@@ -1,4 +1,4 @@
-import { X, Calendar, CreditCard, Wallet, FileText, User, Building2 } from 'lucide-react';
+import { X, Calendar, CreditCard, Wallet, FileText, User, Building2, ExternalLink } from 'lucide-react';
 
 /**
  * @component ProcessDetailModal
@@ -47,9 +47,12 @@ const ProcessDetailModal = ({ process, onClose }) => {
                         </div>
                         <div className="p-3 bg-gray-50/50 rounded-xl border border-gray-200">
                             <span className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Estado</span>
-                            <div className={`font-bold text-sm px-2 py-0.5 rounded-md inline-block ${process.ESTADO === 'FINALIZADO' ? 'bg-emerald-100 text-emerald-700' :
+                            <div className={`font-bold text-sm px-2 py-0.5 rounded-md inline-block ${process.ESTADO === 'TERMINADO' ? 'bg-emerald-100 text-emerald-700' :
                                 process.ESTADO === 'EN PROCESO' ? 'bg-blue-100 text-blue-700' :
-                                    'bg-gray-100 text-gray-700'
+                                    process.ESTADO === 'EN EJECUCIÓN' ? 'bg-indigo-100 text-indigo-700' :
+                                        process.ESTADO === 'LIQUIDADO' ? 'bg-gray-200 text-gray-700' :
+                                            process.ESTADO === 'SUSPENDIDO' ? 'bg-red-100 text-red-700' :
+                                                'bg-yellow-100 text-yellow-700'
                                 }`}>
                                 {process['ESTADO']}
                             </div>
@@ -153,11 +156,28 @@ const ProcessDetailModal = ({ process, onClose }) => {
                     </div>
 
                     {/* Footer Info */}
-                    <div className="bg-gray-50 p-4 rounded-xl flex items-center justify-between text-xs text-gray-500 border border-gray-100 mt-auto">
-                        <div className="flex gap-4">
+                    <div className="bg-gray-50 p-4 rounded-xl flex flex-col gap-3 text-xs text-gray-500 border border-gray-100 mt-auto">
+                        <div className="flex gap-4 flex-wrap">
                             <span className="flex items-center gap-1"><User size={14} /> Supervisor: <strong>{process['SUPERVISOR'] || 'No asignar'}</strong></span>
                             <span className="flex items-center gap-1"><Building2 size={14} /> Apoyo: <strong>{process['APOYO A LA SUPERVISIÓN'] || 'N/A'}</strong></span>
                         </div>
+                        {process['LINK_SECOP'] && (
+                            <a
+                                href={process['LINK_SECOP']}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="secop-badge"
+                                title={`Abrir en SECOP: ${process['LINK_SECOP']}`}
+                            >
+                                <span className="secop-badge-inner" style={{ padding: '6px 12px', fontSize: '11px', gap: '5px' }}>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="secop-icon">
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                        <polyline points="9 12 11 14 15 10"/>
+                                    </svg>
+                                    <span className="secop-label">Ver en SECOP</span>
+                                </span>
+                            </a>
+                        )}
                     </div>
                 </div>
             </div>

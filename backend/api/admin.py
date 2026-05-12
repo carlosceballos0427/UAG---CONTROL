@@ -12,9 +12,9 @@ class UsuarioAdmin(UserAdmin):
 
 @admin.register(Proceso)
 class ProcesoAdmin(admin.ModelAdmin):
-    list_display = ('numero_proceso', 'year', 'contratista', 'estado', 'modalidad', 'fecha_creacion')
+    list_display = ('numero_proceso', 'year', 'contratista', 'estado', 'modalidad', 'link_secop', 'fecha_creacion')
     list_filter = ('year', 'estado', 'modalidad')
-    search_fields = ('numero_proceso', 'contratista', 'objeto')
+    search_fields = ('numero_proceso', 'contratista', 'objeto', 'link_secop')
 
 @admin.register(Adicion)
 class AdicionAdmin(admin.ModelAdmin):

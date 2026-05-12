@@ -31,7 +31,7 @@ const normalizeEstado = (val) => {
     if (!val) return 'PENDIENTE';
     const v = String(val).toUpperCase().trim();
     if (v.includes('EJECU') || v.includes('PROCESO')) return 'EN PROCESO';
-    if (v.includes('FINAL') || v.includes('LIQUID')) return 'FINALIZADO';
+    if (v.includes('TERMIN') || v.includes('FINAL') || v.includes('LIQUID')) return 'TERMINADO';
     if (v.includes('SUSPEND') || v.includes('CANCEL')) return 'SUSPENDIDO';
     if (v.includes('ADJUDI')) return 'EN PROCESO';
     if (v.includes('DESIERTO') || v.includes('DECLAR')) return 'SUSPENDIDO';

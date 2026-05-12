@@ -42,6 +42,7 @@ class Proceso(models.Model):
     supervisor = models.CharField(max_length=200, blank=True, null=True)
     apoyo_supervision = models.CharField(max_length=200, blank=True, null=True, verbose_name="Apoyo a la Supervisión")
     contratista = models.CharField(max_length=200, blank=True, null=True)
+    link_secop = models.URLField(max_length=500, blank=True, null=True, verbose_name="Link SECOP")
     
     # Auditoría básica
     creado_por = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, related_name='procesos_creados')

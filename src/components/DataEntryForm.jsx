@@ -3,12 +3,13 @@
  *
  * Formulario principal para crear y editar procesos contractuales.
  * - Dependencia: select desplegable con lista normalizada de organismos
- * - Pagos: "Cuenta de Cobro" con selector N°1 a N°24
+ * - Pagos: "Cuenta de Cobro" con selector N°1 a N°48
  * - Todos los campos monetarios usan formato colombiano (puntos de miles)
+ * - Link SECOP: campo para pegar el enlace del proceso en SECOP
  */
 import { useState, useEffect, useRef } from 'react';
 import { addEntry, updateEntry } from '../utils/storage';
-import { Save, Info, CreditCard, ShieldCheck, Plus, Trash2, Wallet, Building2, User } from 'lucide-react';
+import { Save, Info, CreditCard, ShieldCheck, Plus, Trash2, Wallet, Building2, User, ExternalLink } from 'lucide-react';
 
 // ─── Utilidades de formateo monetario ─────────────────────────────
 
@@ -41,7 +42,7 @@ const CurrencyInput = ({ value, onChange, className = '', placeholder = '0' }) =
 );
 
 // ─── Opciones de Cuenta de Cobro ──────────────────────────────────
-const CUENTAS_COBRO = Array.from({ length: 24 }, (_, i) => `Cuenta de Cobro N° ${i + 1}`);
+const CUENTAS_COBRO = Array.from({ length: 48 }, (_, i) => `Cuenta de Cobro N° ${i + 1}`);
 
 // ─── Componente principal ─────────────────────────────────────────
 
@@ -76,6 +77,7 @@ const DataEntryForm = ({ editingProcess, onCancel, onSaved, initialYear, years, 
         'SUPERVISOR': '',
         'APOYO A LA SUPERVISIÓN': '',
         'CONTRATISTA': '',
+        'LINK_SECOP': '',
         'ADICIONES': [],
         'PAGOS': []
     });
@@ -90,6 +92,7 @@ const DataEntryForm = ({ editingProcess, onCancel, onSaved, initialYear, years, 
                 ...editingProcess,
                 'SUPERVISOR': editingProcess['SUPERVISOR'] || '',
                 'APOYO A LA SUPERVISIÓN': editingProcess['APOYO A LA SUPERVISIÓN'] || '',
+                'LINK_SECOP': editingProcess['LINK_SECOP'] || '',
                 'ADICIONES': editingProcess['ADICIONES'] || [],
                 'PAGOS': editingProcess['PAGOS'] || []
             });
@@ -434,11 +437,23 @@ const DataEntryForm = ({ editingProcess, onCancel, onSaved, initialYear, years, 
                                 <option value="PENDIENTE">PENDIENTE</option>
                                 <option value="EN PROCESO">EN PROCESO</option>
                                 <option value="EN EJECUCIÓN">EN EJECUCIÓN</option>
-                                <option value="FINALIZADO">FINALIZADO</option>
+                                <option value="TERMINADO">TERMINADO</option>
                                 <option value="LIQUIDADO">LIQUIDADO</option>
                                 <option value="SUSPENDIDO">SUSPENDIDO</option>
                                 <option value="EMPRÉSTITO">EMPRÉSTITO</option>
                             </select>
+                        </div>
+                        <div className="field">
+                            <label className="flex items-center gap-1">
+                                <ExternalLink size={14} className="text-blue-400" /> Link SECOP
+                            </label>
+                            <input
+                                name="LINK_SECOP"
+                                value={formData['LINK_SECOP']}
+                                onChange={handleChange}
+                                placeholder="https://community.secop.gov.co/..."
+                                className="text-blue-600 underline"
+                            />
                         </div>
                     </div>
                 </section>
