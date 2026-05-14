@@ -85,6 +85,7 @@ const Dashboard = ({ data, year, setYear, years }) => {
         const terminados = mainData.filter(d => d.ESTADO === 'TERMINADO').length;
         const liquidados = mainData.filter(d => d.ESTADO === 'LIQUIDADO').length;
         const suspendidos = mainData.filter(d => d.ESTADO === 'SUSPENDIDO').length;
+        const emitidos = mainData.filter(d => d.ESTADO === 'EMITIDO').length;
 
         const presupuestoTotal = mainData.reduce((acc, d) => acc + (parseFloat(d['PRESUPUESTO ESTIMADO']) || 0), 0);
         const valorAdjudicado = mainData.reduce((acc, d) => {
@@ -101,7 +102,7 @@ const Dashboard = ({ data, year, setYear, years }) => {
         return [
             {
                 label: 'Procesos Totales', value: totalProcesos, icon: <LayoutDashboard size={20} />, color: '#6366f1',
-                tooltip: `Pendientes: ${pendientes} | En Proceso: ${enProceso} | En Ejecución: ${enEjecucion} | Terminados: ${terminados} | Liquidados: ${liquidados} | Suspendidos: ${suspendidos}`
+                tooltip: `Pendientes: ${pendientes} | En Proceso: ${enProceso} | En Ejecución: ${enEjecucion} | Terminados: ${terminados} | Liquidados: ${liquidados} | Suspendidos: ${suspendidos} | Emitidos: ${emitidos}`
             },
             {
                 label: 'Presupuesto Estimado', value: fmtCurrency(presupuestoTotal), icon: <DollarSign size={20} />, color: '#8b5cf6',

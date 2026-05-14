@@ -499,6 +499,7 @@ const DataEntryForm = ({ editingProcess, onCancel, onSaved, initialYear, years, 
                                 <option value="LIQUIDADO">LIQUIDADO</option>
                                 <option value="SUSPENDIDO">SUSPENDIDO</option>
                                 <option value="EMPRÉSTITO">EMPRÉSTITO</option>
+                                <option value="EMITIDO">EMITIDO</option>
                             </select>
                         </div>
                         <div className="field">

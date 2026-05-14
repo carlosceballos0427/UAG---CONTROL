@@ -35,6 +35,7 @@ const normalizeEstado = (val) => {
     if (v.includes('SUSPEND') || v.includes('CANCEL')) return 'SUSPENDIDO';
     if (v.includes('ADJUDI')) return 'EN PROCESO';
     if (v.includes('DESIERTO') || v.includes('DECLAR')) return 'SUSPENDIDO';
+    if (v.includes('EMITID')) return 'EMITIDO';
     return 'PENDIENTE';
 };
 
