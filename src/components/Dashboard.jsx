@@ -318,7 +318,7 @@ const Dashboard = ({ data, year, setYear, years }) => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
                     <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
-                        <LineChart size={20} className="text-blue-500" /> Ejecución Ejecutada por Mes
+                        <LineChart size={20} className="text-blue-500" /> Ejecución Financiera por Mes
                     </h3>
                     <div className="h-[350px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
