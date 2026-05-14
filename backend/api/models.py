@@ -39,6 +39,13 @@ class Proceso(models.Model):
     
     estado = models.CharField(max_length=50, default="PENDIENTE")
     
+    TIPO_SALDO_CHOICES = (
+        ('', 'Sin clasificar'),
+        ('A_FAVOR', 'Saldo a Favor'),
+        ('CUENTAS_POR_COBRAR', 'Cuentas por Cobrar'),
+    )
+    tipo_saldo = models.CharField(max_length=30, choices=TIPO_SALDO_CHOICES, default='', blank=True, verbose_name="Tipo de Saldo")
+    
     supervisor = models.CharField(max_length=200, blank=True, null=True)
     apoyo_supervision = models.CharField(max_length=200, blank=True, null=True, verbose_name="Apoyo a la Supervisión")
     contratista = models.CharField(max_length=200, blank=True, null=True)

@@ -9,20 +9,23 @@
  */
 import { useState, useEffect, useRef } from 'react';
 import { addEntry, updateEntry } from '../utils/storage';
-import { Save, Info, CreditCard, ShieldCheck, Plus, Trash2, Wallet, Building2, User, ExternalLink } from 'lucide-react';
+import { Save, Info, CreditCard, ShieldCheck, Plus, Trash2, Wallet, Building2, User, ExternalLink, TrendingUp, TrendingDown } from 'lucide-react';
 
 // ─── Utilidades de formateo monetario ─────────────────────────────
 
-/** Formatea número con puntos de miles colombianos. Ej: 2350000 → "2.350.000" */
+/** Formatea número con puntos de miles y coma decimal colombianos. Ej: 2350000.5 → "2.350.000,50" */
 const formatColNumber = (value) => {
-    if (!value || value === 0) return '';
-    return new Intl.NumberFormat('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
+    if (value === null || value === undefined || value === '') return '';
+    const num = typeof value === 'string' ? parseColNumber(value) : value;
+    if (num === 0) return '';
+    return new Intl.NumberFormat('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num);
 };
 
-/** Convierte cadena formateada a número limpio. Ej: "2.350.000" → 2350000 */
+/** Convierte cadena formateada a número limpio con decimales. Ej: "2.350.000,50" → 2350000.50 */
 const parseColNumber = (str) => {
-    if (!str) return 0;
-    return parseInt(String(str).replace(/[^\d]/g, ''), 10) || 0;
+    if (!str && str !== 0) return 0;
+    const s = String(str).replace(/\./g, '').replace(',', '.');
+    return parseFloat(s) || 0;
 };
 
 /**
@@ -30,16 +33,23 @@ const parseColNumber = (str) => {
  * Input de texto que muestra el valor con separadores de miles colombianos.
  * Al escribir, solo acepta dígitos y formatea en tiempo real.
  */
-const CurrencyInput = ({ value, onChange, className = '', placeholder = '0' }) => (
-    <input
-        type="text"
-        inputMode="numeric"
-        value={formatColNumber(value)}
-        onChange={(e) => onChange(parseColNumber(e.target.value))}
-        className={className}
-        placeholder={placeholder}
-    />
-);
+const CurrencyInput = ({ value, onChange, className = '', placeholder = '0,00' }) => {
+    const handleChange = (e) => {
+        // Allow digits, dots (thousands) and comma (decimal)
+        let raw = e.target.value.replace(/[^\d.,]/g, '');
+        onChange(parseColNumber(raw));
+    };
+    return (
+        <input
+            type="text"
+            inputMode="decimal"
+            value={formatColNumber(value)}
+            onChange={handleChange}
+            className={className}
+            placeholder={placeholder}
+        />
+    );
+};
 
 // ─── Opciones de Cuenta de Cobro ──────────────────────────────────
 const CUENTAS_COBRO = Array.from({ length: 48 }, (_, i) => `Cuenta de Cobro N° ${i + 1}`);
@@ -73,6 +83,7 @@ const DataEntryForm = ({ editingProcess, onCancel, onSaved, initialYear, years, 
         'VALOR ADJUDICADO': 0,
         'CDP': 0,
         'SALDO POR PAGAR': 0,
+        'TIPO_SALDO': '',
         'ESTADO': 'PENDIENTE',
         'SUPERVISOR': '',
         'APOYO A LA SUPERVISIÓN': '',
@@ -93,6 +104,7 @@ const DataEntryForm = ({ editingProcess, onCancel, onSaved, initialYear, years, 
                 'SUPERVISOR': editingProcess['SUPERVISOR'] || '',
                 'APOYO A LA SUPERVISIÓN': editingProcess['APOYO A LA SUPERVISIÓN'] || '',
                 'LINK_SECOP': editingProcess['LINK_SECOP'] || '',
+                'TIPO_SALDO': editingProcess['TIPO_SALDO'] || '',
                 'ADICIONES': editingProcess['ADICIONES'] || [],
                 'PAGOS': editingProcess['PAGOS'] || []
             });
@@ -304,11 +316,57 @@ const DataEntryForm = ({ editingProcess, onCancel, onSaved, initialYear, years, 
                                 <Wallet size={14} /> Saldo por Pagar (Automático)
                             </label>
                             <div className="text-2xl font-black text-emerald-600">
-                                $ {formatColNumber(formData['SALDO POR PAGAR'] || 0) || '0'}
+                                $ {formatColNumber(formData['SALDO POR PAGAR'] || 0) || '0,00'}
                             </div>
                             <div className="text-[10px] text-emerald-600/70 mt-1 font-medium">
                                 Val. Adjudicado + Adiciones − Total Pagos
                             </div>
+                        </div>
+                    </div>
+
+                    {/* ── Clasificación del Saldo ── */}
+                    <div className="mt-6 p-5 rounded-2xl border border-gray-100 bg-gradient-to-br from-gray-50 to-white shadow-sm">
+                        <label className="text-xs font-black text-gray-600 uppercase tracking-widest mb-3 block flex items-center gap-2">
+                            <CreditCard size={14} className="text-indigo-500" /> Clasificación del Saldo
+                        </label>
+                        <p className="text-[11px] text-gray-400 mb-4">Indique si el saldo resultante es a favor de la entidad o si corresponde a cuentas por cobrar.</p>
+                        <div className="flex gap-3">
+                            {/* Sin clasificar */}
+                            <button
+                                type="button"
+                                onClick={() => setFormData(prev => ({ ...prev, 'TIPO_SALDO': '' }))}
+                                className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all duration-200 border-2 ${
+                                    formData['TIPO_SALDO'] === ''
+                                        ? 'border-gray-400 bg-gray-100 text-gray-700 shadow-md'
+                                        : 'border-gray-200 bg-white text-gray-400 hover:border-gray-300 hover:bg-gray-50'
+                                }`}
+                            >
+                                Sin clasificar
+                            </button>
+                            {/* Saldo a Favor */}
+                            <button
+                                type="button"
+                                onClick={() => setFormData(prev => ({ ...prev, 'TIPO_SALDO': 'A_FAVOR' }))}
+                                className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all duration-200 border-2 flex items-center justify-center gap-2 ${
+                                    formData['TIPO_SALDO'] === 'A_FAVOR'
+                                        ? 'border-emerald-500 bg-emerald-50 text-emerald-700 shadow-md shadow-emerald-100 ring-2 ring-emerald-200'
+                                        : 'border-gray-200 bg-white text-gray-400 hover:border-emerald-300 hover:bg-emerald-50/30'
+                                }`}
+                            >
+                                <TrendingUp size={16} /> Saldo a Favor
+                            </button>
+                            {/* Cuentas por Cobrar */}
+                            <button
+                                type="button"
+                                onClick={() => setFormData(prev => ({ ...prev, 'TIPO_SALDO': 'CUENTAS_POR_COBRAR' }))}
+                                className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all duration-200 border-2 flex items-center justify-center gap-2 ${
+                                    formData['TIPO_SALDO'] === 'CUENTAS_POR_COBRAR'
+                                        ? 'border-rose-500 bg-rose-50 text-rose-700 shadow-md shadow-rose-100 ring-2 ring-rose-200'
+                                        : 'border-gray-200 bg-white text-gray-400 hover:border-rose-300 hover:bg-rose-50/30'
+                                }`}
+                            >
+                                <TrendingDown size={16} /> Cuentas por Cobrar
+                            </button>
                         </div>
                     </div>
 
@@ -351,7 +409,7 @@ const DataEntryForm = ({ editingProcess, onCancel, onSaved, initialYear, years, 
                             {(formData['ADICIONES'] || []).length > 0 && (
                                 <div className="flex justify-end p-2">
                                     <span className="text-xs text-gray-500">Total Adiciones: </span>
-                                    <span className="text-sm font-bold text-gray-800 ml-1">$ {formatColNumber(adicionesTotal) || '0'}</span>
+                                    <span className="text-sm font-bold text-gray-800 ml-1">$ {formatColNumber(adicionesTotal) || '0,00'}</span>
                                 </div>
                             )}
                         </div>
@@ -416,7 +474,7 @@ const DataEntryForm = ({ editingProcess, onCancel, onSaved, initialYear, years, 
                             {(formData['PAGOS'] || []).length > 0 ? (
                                 <div className="flex justify-end p-2">
                                     <span className="text-xs text-gray-500">Total Pagado: </span>
-                                    <span className="text-sm font-bold text-emerald-600 ml-1">$ {formatColNumber(pagosTotal) || '0'}</span>
+                                    <span className="text-sm font-bold text-emerald-600 ml-1">$ {formatColNumber(pagosTotal) || '0,00'}</span>
                                 </div>
                             ) : (
                                 <div className="text-center py-4 text-gray-400 text-sm italic">

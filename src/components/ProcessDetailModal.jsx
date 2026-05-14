@@ -1,4 +1,4 @@
-import { X, Calendar, CreditCard, Wallet, FileText, User, Building2, ExternalLink } from 'lucide-react';
+import { X, Calendar, CreditCard, Wallet, FileText, User, Building2, ExternalLink, TrendingUp, TrendingDown } from 'lucide-react';
 
 /**
  * @component ProcessDetailModal
@@ -8,7 +8,7 @@ import { X, Calendar, CreditCard, Wallet, FileText, User, Building2, ExternalLin
 const ProcessDetailModal = ({ process, onClose }) => {
     if (!process) return null;
 
-    const formatCurrency = (val) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(val || 0);
+    const formatCurrency = (val) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(val || 0);
 
     const adicionesTotal = (process['ADICIONES'] || []).reduce((s, a) => s + (parseFloat(a.valor) || 0), 0);
     const pagosTotal = (process['PAGOS'] || []).reduce((s, p) => s + (parseFloat(p.valor) || 0), 0);
@@ -80,6 +80,18 @@ const ProcessDetailModal = ({ process, onClose }) => {
                             <div>
                                 <span className="text-xs text-gray-400 font-medium">Saldo Pendiente</span>
                                 <div className="text-2xl font-black text-amber-500 mt-1">{formatCurrency(saldo)}</div>
+                                {process['TIPO_SALDO'] === 'A_FAVOR' && (
+                                    <div className="inline-flex items-center gap-1.5 mt-2 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200">
+                                        <TrendingUp size={14} className="text-emerald-600" />
+                                        <span className="text-[11px] font-bold text-emerald-700 uppercase tracking-wide">Saldo a Favor</span>
+                                    </div>
+                                )}
+                                {process['TIPO_SALDO'] === 'CUENTAS_POR_COBRAR' && (
+                                    <div className="inline-flex items-center gap-1.5 mt-2 px-3 py-1.5 rounded-lg bg-rose-50 border border-rose-200">
+                                        <TrendingDown size={14} className="text-rose-600" />
+                                        <span className="text-[11px] font-bold text-rose-700 uppercase tracking-wide">Cuentas por Cobrar</span>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </section>

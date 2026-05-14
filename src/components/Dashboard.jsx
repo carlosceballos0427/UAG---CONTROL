@@ -4,7 +4,10 @@ import {
     PieChart, Pie, Cell, Legend,
     BarChart, Bar
 } from 'recharts';
-import { LayoutDashboard, CheckCircle, Clock, DollarSign, Wallet, Building2, Landmark } from 'lucide-react';
+import { LayoutDashboard, Clock, DollarSign, Wallet, Building2, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+
+/** Formatea valores monetarios con 2 decimales */
+const fmtCurrency = (val) => `$ ${new Intl.NumberFormat('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(val || 0)}`;
 
 // ─── Tooltip personalizado para el Pie Chart ──────────────────────
 const CustomPieTooltip = ({ active, payload }) => {
@@ -41,7 +44,7 @@ const CustomLineTooltip = ({ active, payload, label }) => {
             <div className="bg-white px-4 py-3 rounded-2xl shadow-xl border border-gray-100">
                 <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">{label}</div>
                 <div className="text-lg font-black text-blue-700">
-                    ${new Intl.NumberFormat('es-CO').format(payload[0].value)}
+                    {fmtCurrency(payload[0].value)}
                 </div>
                 <div className="text-[10px] text-gray-400 mt-0.5">Ejecución del mes</div>
             </div>
@@ -54,12 +57,32 @@ const Dashboard = ({ data, year, setYear, years }) => {
     const mainData = useMemo(() => data.filter(d => d.ESTADO !== 'EMPRÉSTITO'), [data]);
     const emprestitoData = useMemo(() => data.filter(d => d.ESTADO === 'EMPRÉSTITO'), [data]);
 
+    // ─── Métricas de Saldo a Favor y Cuentas por Cobrar ──────────────
+    const saldoMetrics = useMemo(() => {
+        const aFavor = mainData.filter(d => d['TIPO_SALDO'] === 'A_FAVOR');
+        const cxc = mainData.filter(d => d['TIPO_SALDO'] === 'CUENTAS_POR_COBRAR');
+
+        const calcSaldo = (items) => items.reduce((acc, d) => {
+            const adiciones = (d['ADICIONES'] || []).reduce((sum, adj) => sum + (parseFloat(adj.valor) || 0), 0);
+            const valorTotal = (parseFloat(d['VALOR ADJUDICADO']) || 0) + adiciones;
+            const pagos = (d['PAGOS'] || []).reduce((sum, p) => sum + (parseFloat(p.valor) || 0), 0);
+            return acc + (valorTotal - pagos);
+        }, 0);
+
+        return {
+            aFavorCount: aFavor.length,
+            aFavorTotal: calcSaldo(aFavor),
+            cxcCount: cxc.length,
+            cxcTotal: calcSaldo(cxc),
+        };
+    }, [mainData]);
+
     const metrics = useMemo(() => {
         const totalProcesos = mainData.length;
-        const terminados = mainData.filter(d => d.ESTADO === 'TERMINADO').length;
         const enProceso = mainData.filter(d => d.ESTADO === 'EN PROCESO').length;
         const enEjecucion = mainData.filter(d => d.ESTADO === 'EN EJECUCIÓN').length;
         const pendientes = mainData.filter(d => d.ESTADO === 'PENDIENTE' || !d.ESTADO).length;
+        const terminados = mainData.filter(d => d.ESTADO === 'TERMINADO').length;
         const liquidados = mainData.filter(d => d.ESTADO === 'LIQUIDADO').length;
         const suspendidos = mainData.filter(d => d.ESTADO === 'SUSPENDIDO').length;
 
@@ -81,19 +104,15 @@ const Dashboard = ({ data, year, setYear, years }) => {
                 tooltip: `Pendientes: ${pendientes} | En Proceso: ${enProceso} | En Ejecución: ${enEjecucion} | Terminados: ${terminados} | Liquidados: ${liquidados} | Suspendidos: ${suspendidos}`
             },
             {
-                label: 'Terminados', value: terminados, icon: <CheckCircle size={20} />, color: '#10b981',
-                tooltip: `${totalProcesos > 0 ? ((terminados / totalProcesos) * 100).toFixed(1) : 0}% del total de procesos`
-            },
-            {
-                label: 'Presupuesto Estimado', value: `$ ${new Intl.NumberFormat('es-CO').format(presupuestoTotal)}`, icon: <DollarSign size={20} />, color: '#8b5cf6',
+                label: 'Presupuesto Estimado', value: fmtCurrency(presupuestoTotal), icon: <DollarSign size={20} />, color: '#8b5cf6',
                 tooltip: `Presupuesto estimado total para el año ${year}`
             },
             {
-                label: 'Valor Adjudicado + Adic.', value: `$ ${new Intl.NumberFormat('es-CO').format(valorAdjudicado)}`, icon: <Wallet size={20} />, color: '#3b82f6',
-                tooltip: `Total pagado: $${new Intl.NumberFormat('es-CO').format(totalPagado)} (${valorAdjudicado > 0 ? ((totalPagado / valorAdjudicado) * 100).toFixed(1) : 0}% ejecutado)`
+                label: 'Valor Adjudicado + Adic.', value: fmtCurrency(valorAdjudicado), icon: <Wallet size={20} />, color: '#3b82f6',
+                tooltip: `Total pagado: ${fmtCurrency(totalPagado)} (${valorAdjudicado > 0 ? ((totalPagado / valorAdjudicado) * 100).toFixed(1) : 0}% ejecutado)`
             },
             {
-                label: 'Saldo por Pagar', value: `$ ${new Intl.NumberFormat('es-CO').format(saldoTotal)}`, icon: <Clock size={20} />, color: '#f59e0b',
+                label: 'Saldo por Pagar', value: fmtCurrency(saldoTotal), icon: <Clock size={20} />, color: '#f59e0b',
                 tooltip: `Pendiente de ejecución financiera`
             },
         ];
@@ -190,12 +209,13 @@ const Dashboard = ({ data, year, setYear, years }) => {
                     </div>
                     <div className="text-right bg-black/10 px-6 py-4 rounded-2xl">
                         <div className="text-xs font-bold text-purple-200 uppercase tracking-widest mb-1">Valor Total de Empréstitos</div>
-                        <div className="text-3xl font-black text-emerald-300">$ {new Intl.NumberFormat('es-CO').format(emprestitoMetrics.valorTotal)}</div>
+                        <div className="text-3xl font-black text-emerald-300">{fmtCurrency(emprestitoMetrics.valorTotal)}</div>
                     </div>
                 </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
+            {/* ─── Tarjetas de métricas principales (4 columnas) ─── */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {metrics.map((m, i) => {
                     const valueStr = String(m.value);
                     const fontSize = valueStr.length > 18 ? 'text-sm' : valueStr.length > 12 ? 'text-base' : 'text-xl';
@@ -225,6 +245,73 @@ const Dashboard = ({ data, year, setYear, years }) => {
                         </div>
                     );
                 })}
+            </div>
+
+            {/* ─── Sección: Saldos a Favor y Cuentas por Cobrar ─── */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                {/* Saldos a Favor */}
+                <div className="relative overflow-hidden rounded-2xl border border-emerald-200/60 bg-gradient-to-br from-emerald-50 via-white to-teal-50 p-6 shadow-sm hover:shadow-lg transition-all duration-300 group">
+                    <div className="absolute -top-8 -right-8 w-32 h-32 bg-emerald-100/40 rounded-full blur-2xl group-hover:bg-emerald-200/50 transition-all duration-500"></div>
+                    <div className="relative z-10">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="p-3 rounded-xl bg-emerald-100 shadow-sm">
+                                <TrendingUp size={22} className="text-emerald-600" />
+                            </div>
+                            <div>
+                                <h3 className="text-xs font-black text-emerald-600 uppercase tracking-widest">Saldos a Favor</h3>
+                                <p className="text-[10px] text-emerald-400 font-medium mt-0.5">Procesos con saldo positivo a favor</p>
+                            </div>
+                        </div>
+                        <div className="flex items-end justify-between">
+                            <div>
+                                <div className="text-4xl font-black text-emerald-700 tracking-tight">{saldoMetrics.aFavorCount}</div>
+                                <div className="text-xs text-emerald-500 font-semibold mt-1">procesos clasificados</div>
+                            </div>
+                            <div className="text-right">
+                                <div className="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-1">Valor Total</div>
+                                <div className="text-xl font-black text-emerald-700">{fmtCurrency(saldoMetrics.aFavorTotal)}</div>
+                            </div>
+                        </div>
+                        {saldoMetrics.aFavorCount > 0 && (
+                            <div className="mt-4 flex items-center gap-2 text-emerald-500">
+                                <ArrowUpRight size={14} />
+                                <span className="text-[10px] font-bold uppercase tracking-widest">Saldos disponibles</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Cuentas por Cobrar */}
+                <div className="relative overflow-hidden rounded-2xl border border-rose-200/60 bg-gradient-to-br from-rose-50 via-white to-pink-50 p-6 shadow-sm hover:shadow-lg transition-all duration-300 group">
+                    <div className="absolute -top-8 -right-8 w-32 h-32 bg-rose-100/40 rounded-full blur-2xl group-hover:bg-rose-200/50 transition-all duration-500"></div>
+                    <div className="relative z-10">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="p-3 rounded-xl bg-rose-100 shadow-sm">
+                                <TrendingDown size={22} className="text-rose-600" />
+                            </div>
+                            <div>
+                                <h3 className="text-xs font-black text-rose-600 uppercase tracking-widest">Cuentas por Cobrar</h3>
+                                <p className="text-[10px] text-rose-400 font-medium mt-0.5">Procesos con cobros pendientes</p>
+                            </div>
+                        </div>
+                        <div className="flex items-end justify-between">
+                            <div>
+                                <div className="text-4xl font-black text-rose-700 tracking-tight">{saldoMetrics.cxcCount}</div>
+                                <div className="text-xs text-rose-500 font-semibold mt-1">procesos clasificados</div>
+                            </div>
+                            <div className="text-right">
+                                <div className="text-xs font-bold text-rose-400 uppercase tracking-widest mb-1">Valor Total</div>
+                                <div className="text-xl font-black text-rose-700">{fmtCurrency(saldoMetrics.cxcTotal)}</div>
+                            </div>
+                        </div>
+                        {saldoMetrics.cxcCount > 0 && (
+                            <div className="mt-4 flex items-center gap-2 text-rose-500">
+                                <ArrowDownRight size={14} />
+                                <span className="text-[10px] font-bold uppercase tracking-widest">Pendientes de cobro</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

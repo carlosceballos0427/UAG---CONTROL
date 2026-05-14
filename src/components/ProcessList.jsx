@@ -21,7 +21,7 @@ const ESTADO_STYLES = {
 const getEstadoStyle = (e) => ESTADO_STYLES[e] || ESTADO_STYLES['PENDIENTE'];
 
 const ProcessList = ({ data, onEdit, onDelete, userRole = 'radicador' }) => {
-    const fmt = (v) => `$ ${new Intl.NumberFormat('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(v || 0)}`;
+    const fmt = (v) => `$ ${new Intl.NumberFormat('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v || 0)}`;
 
     const [selectedProcess, setSelectedProcess] = useState(null);
     const [filterEstado, setFilterEstado] = useState(null);
@@ -177,11 +177,21 @@ const ProcessList = ({ data, onEdit, onDelete, userRole = 'radicador' }) => {
                                             </span>
                                         </td>
 
-                                        {/* Saldo */}
+                                        {/* Saldo + Clasificación */}
                                         <td className="px-2 py-2.5 text-right">
                                             <span className={`font-mono text-[11px] font-semibold truncate block ${saldo <= 0 ? 'text-green-600' : 'text-amber-600'}`} title={fmt(saldo)}>
                                                 {fmt(saldo)}
                                             </span>
+                                            {item['TIPO_SALDO'] === 'A_FAVOR' && (
+                                                <span className="inline-flex items-center gap-0.5 mt-0.5 px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-600 text-[8px] font-bold uppercase tracking-wide">
+                                                    <span className="w-1 h-1 rounded-full bg-emerald-500"></span>A Favor
+                                                </span>
+                                            )}
+                                            {item['TIPO_SALDO'] === 'CUENTAS_POR_COBRAR' && (
+                                                <span className="inline-flex items-center gap-0.5 mt-0.5 px-1.5 py-0.5 rounded-md bg-rose-50 text-rose-600 text-[8px] font-bold uppercase tracking-wide">
+                                                    <span className="w-1 h-1 rounded-full bg-rose-500"></span>CxC
+                                                </span>
+                                            )}
                                         </td>
 
                                         {/* Estado */}
