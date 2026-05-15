@@ -5,7 +5,7 @@ import ProcessList from './components/ProcessList'
 import Settings from './components/Settings'
 import ErrorBoundary from './components/ErrorBoundary'
 import { getStoredData, deleteEntry, getStoredYears, saveStoredYears, getStoredDependencias, saveDependencias } from './utils/storage'
-import { Settings as SettingsIcon, Eye, EyeOff } from 'lucide-react'
+import { Settings as SettingsIcon, Eye, EyeOff, Moon, Sun, Menu, X } from 'lucide-react'
 import './styles/App.css'
 
 const API_BASE = '/api';
@@ -23,6 +23,26 @@ function App() {
     const [loginPassword, setLoginPassword] = useState('')
     const [loginError, setLoginError] = useState('')
     const [showPassword, setShowPassword] = useState(false)
+    
+    // UI States
+    const [isDarkMode, setIsDarkMode] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('uag_theme') === 'dark' ||
+                (!('uag_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        }
+        return false;
+    });
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+    useEffect(() => {
+        if (isDarkMode) {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('uag_theme', 'dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('uag_theme', 'light');
+        }
+    }, [isDarkMode]);
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -202,22 +222,29 @@ function App() {
 
     return (
         <div className="app-container">
-            <aside className="sidebar">
+            <aside className={`sidebar ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
                 {/* Logo / Nombre de la app */}
                 <div className="logo mb-10">
                     <div className="text-xl font-black text-white tracking-widest leading-none">UAG</div>
                     <div className="text-xs font-bold text-blue-300 tracking-[0.2em] uppercase">Control</div>
                 </div>
                 <nav className="flex flex-col gap-2">
+                    {isMobileMenuOpen && (
+                        <div className="flex justify-end md:hidden mb-4">
+                            <button onClick={() => setIsMobileMenuOpen(false)} className="text-gray-400 hover:text-white">
+                                <X size={24} />
+                            </button>
+                        </div>
+                    )}
                     <button
                         className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('dashboard')}
+                        onClick={() => { setActiveTab('dashboard'); setIsMobileMenuOpen(false); }}
                     >
                         <span className="text-lg">📊</span> Dashboard
                     </button>
                     <button
                         className={`nav-item ${activeTab === 'list' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('list')}
+                        onClick={() => { setActiveTab('list'); setIsMobileMenuOpen(false); }}
                     >
                         <span className="text-lg">📋</span> Listado
                     </button>
@@ -226,19 +253,29 @@ function App() {
                         onClick={() => {
                             setEditingProcess(null);
                             setActiveTab('entry');
+                            setIsMobileMenuOpen(false);
                         }}
                     >
                         <span className="text-lg">✍️</span> {editingProcess ? 'Editar' : 'Diligenciar'}
                     </button>
                     <div className="mt-auto pt-10">
+                        {/* Dark Mode Toggle */}
+                        <button
+                            className="nav-item w-full mb-2"
+                            onClick={() => setIsDarkMode(!isDarkMode)}
+                        >
+                            {isDarkMode ? <Sun size={18} className="text-yellow-400" /> : <Moon size={18} />}
+                            {isDarkMode ? 'Modo Claro' : 'Modo Oscuro'}
+                        </button>
+
                         <button
                             className={`nav-item w-full ${activeTab === 'settings' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('settings')}
+                            onClick={() => { setActiveTab('settings'); setIsMobileMenuOpen(false); }}
                         >
                             <SettingsIcon size={18} /> Configuración
                         </button>
 
-                        <div className="my-4 border-t border-gray-200/20"></div>
+                        <div className="my-4 border-t border-gray-200/20 dark:border-gray-700/50"></div>
                         <div className="px-3 mb-2">
                             <div className="text-xs text-gray-400 font-bold truncate">{user?.email}</div>
                             <div className="text-[10px] text-blue-400 font-bold uppercase mt-0.5">{user?.rol || 'radicador'}</div>
@@ -252,7 +289,30 @@ function App() {
                     </div>
                 </nav>
             </aside>
-            <main className="content p-8 bg-gray-50 min-h-screen">
+            
+            {/* Overlay para menú móvil */}
+            {isMobileMenuOpen && (
+                <div 
+                    className="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                ></div>
+            )}
+
+            <main className="content p-4 md:p-8 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
+                {/* Header Móvil */}
+                <div className="md:hidden flex justify-between items-center mb-6 bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <div className="flex items-center gap-2">
+                        <div className="text-xl font-black text-blue-600 dark:text-blue-400 tracking-widest leading-none">UAG</div>
+                        <div className="text-xs font-bold text-gray-400 tracking-[0.2em] uppercase">Control</div>
+                    </div>
+                    <button 
+                        onClick={() => setIsMobileMenuOpen(true)}
+                        className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                    >
+                        <Menu size={24} />
+                    </button>
+                </div>
+
                 <div className="max-w-7xl mx-auto">
                     {activeTab === 'dashboard' && (
                         <ErrorBoundary>
@@ -261,16 +321,16 @@ function App() {
                     )}
                     {activeTab === 'list' && (
                         <div className="animate-fade-in">
-                            <header className="mb-8 flex justify-between items-center">
+                            <header className="mb-8 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                                 <div>
-                                    <h1 className="text-3xl font-black text-gray-900 tracking-tight">Seguimiento de Contratos</h1>
-                                    <p className="text-gray-500 mt-1">Gestión integral de la ejecución financiera — UAG Control</p>
+                                    <h1 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white tracking-tight">Seguimiento de Contratos</h1>
+                                    <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm md:text-base">Gestión integral de la ejecución financiera — UAG Control</p>
                                 </div>
-                                <div className="year-selector bg-white p-1 rounded-xl shadow-sm border border-gray-100 flex gap-1">
+                                <div className="year-selector bg-white dark:bg-gray-800 p-1 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex gap-1 self-start md:self-auto overflow-x-auto max-w-full">
                                     {years.map(y => (
                                         <button
                                             key={y}
-                                            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${year === y ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'text-gray-500 hover:bg-gray-50'}`}
+                                            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${year === y ? 'bg-blue-600 text-white shadow-md shadow-blue-200 dark:shadow-blue-900/50' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
                                             onClick={() => setYear(y)}
                                         >{y}</button>
                                     ))}

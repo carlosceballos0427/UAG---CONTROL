@@ -175,24 +175,64 @@ const Dashboard = ({ data, year, setYear, years }) => {
 
     const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#6366f1', '#6b7280', '#ec4899', '#8b5cf6'];
 
+    // ─── Top Contratistas ──────────────────────────────────────────
+    const topContratistas = useMemo(() => {
+        const agrupar = mainData.reduce((acc, d) => {
+            const name = d['CONTRATISTA'] || 'SIN DEFINIR';
+            const adiciones = (d['ADICIONES'] || []).reduce((sum, adj) => sum + (parseFloat(adj.valor) || 0), 0);
+            const valorTotal = (parseFloat(d['VALOR ADJUDICADO']) || 0) + adiciones;
+            if (!acc[name]) acc[name] = { valor: 0, procesos: 0 };
+            acc[name].valor += valorTotal;
+            acc[name].procesos += 1;
+            return acc;
+        }, {});
+        
+        return Object.keys(agrupar)
+            .map(name => ({ name, ...agrupar[name] }))
+            .sort((a, b) => b.valor - a.valor)
+            .slice(0, 5); // Top 5
+    }, [mainData]);
+
+    // ─── Eficiencia Financiera ─────────────────────────────────────
+    const eficiencia = useMemo(() => {
+        const presupuestoTotal = mainData.reduce((acc, d) => acc + (parseFloat(d['PRESUPUESTO ESTIMADO']) || 0), 0);
+        
+        let adjudicadoTotal = 0;
+        let totalPagado = 0;
+        
+        mainData.forEach(d => {
+            const adiciones = (d['ADICIONES'] || []).reduce((sum, adj) => sum + (parseFloat(adj.valor) || 0), 0);
+            const valAdjudicado = (parseFloat(d['VALOR ADJUDICADO']) || 0) + adiciones;
+            const valPagado = (d['PAGOS'] || []).reduce((sum, p) => sum + (parseFloat(p.valor) || 0), 0);
+            
+            adjudicadoTotal += valAdjudicado;
+            
+            // Si el proceso tiene SALDO A FAVOR (pagos > adjudicado), lo tomamos como 100% pagado (valAdjudicado)
+            // para no inflar el porcentaje global. Si no, tomamos el valor pagado real.
+            if (d['TIPO_SALDO'] === 'A_FAVOR' || valPagado > valAdjudicado) {
+                totalPagado += valAdjudicado;
+            } else {
+                totalPagado += valPagado;
+            }
+        });
+        
+        // % del presupuesto que se adjudicó
+        const porcentajeAdjudicado = presupuestoTotal > 0 ? (adjudicadoTotal / presupuestoTotal) * 100 : 0;
+        // % de lo adjudicado que ya se pagó (Avance real)
+        const porcentajePagado = adjudicadoTotal > 0 ? (totalPagado / adjudicadoTotal) * 100 : 0;
+
+        return { porcentajeAdjudicado, porcentajePagado, adjudicadoTotal, totalPagado };
+    }, [mainData]);
+
     // ─── Hover tooltip state para tarjetas ────────────────────────
     const [hoveredCard, setHoveredCard] = useState(null);
 
     return (
         <div className="dashboard-root animate-fade-in">
-            <header className="dashboard-header mb-8 flex justify-between items-center">
+            <header className="dashboard-header mb-8 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-black text-gray-900 tracking-tight">Dashboard General</h1>
-                    <p className="text-gray-500 mt-1">Resumen ejecutivo de la ejecución del año {year}</p>
-                </div>
-                <div className="year-selector bg-white p-1 rounded-xl shadow-sm border border-gray-100 flex gap-1">
-                    {(years || ['2025', '2026']).map(y => (
-                        <button
-                            key={y}
-                            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${year === y ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'text-gray-500 hover:bg-gray-50'}`}
-                            onClick={() => setYear(y)}
-                        >{y}</button>
-                    ))}
+                    <h1 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white tracking-tight">Resumen Ejecutivo</h1>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm md:text-base">Análisis de ejecución financiera y contractual — Año {year}</p>
                 </div>
             </header>
 
@@ -219,28 +259,28 @@ const Dashboard = ({ data, year, setYear, years }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {metrics.map((m, i) => {
                     const valueStr = String(m.value);
-                    const fontSize = valueStr.length > 18 ? 'text-sm' : valueStr.length > 12 ? 'text-base' : 'text-xl';
+                    const fontSize = valueStr.length > 18 ? 'text-sm' : valueStr.length > 12 ? 'text-base' : 'text-xl md:text-2xl';
 
                     return (
                         <div
                             key={i}
-                            className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition-all relative overflow-hidden group flex flex-col justify-between min-h-[130px] cursor-default"
+                            className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-all relative overflow-hidden group flex flex-col justify-between min-h-[130px] cursor-default"
                             onMouseEnter={() => setHoveredCard(i)}
                             onMouseLeave={() => setHoveredCard(null)}
                         >
-                            <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity" style={{ color: m.color }}>
+                            <div className="absolute top-0 right-0 p-3 opacity-10 dark:opacity-20 group-hover:opacity-20 transition-opacity" style={{ color: m.color }}>
                                 {m.icon}
                             </div>
-                            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest leading-tight min-h-[28px]">{m.label}</span>
-                            <div className={`mt-2 ${fontSize} font-black text-gray-900 break-all leading-tight`} title={valueStr}>{m.value}</div>
+                            <span className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest leading-tight min-h-[28px]">{m.label}</span>
+                            <div className={`mt-2 ${fontSize} font-black text-gray-900 dark:text-white break-all leading-tight`} title={valueStr}>{m.value}</div>
                             <div className="h-1 w-12 mt-4 rounded-full" style={{ backgroundColor: m.color }}></div>
 
                             {/* Tooltip al hover */}
                             {hoveredCard === i && m.tooltip && (
-                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 bg-gray-900 text-white text-[11px] px-4 py-2.5 rounded-xl shadow-2xl whitespace-nowrap animate-fade-in pointer-events-none max-w-[350px] text-center leading-relaxed"
+                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 bg-gray-900 dark:bg-gray-700 text-white text-[11px] px-4 py-2.5 rounded-xl shadow-2xl whitespace-nowrap animate-fade-in pointer-events-none max-w-[350px] text-center leading-relaxed"
                                      style={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
                                     {m.tooltip}
-                                    <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-transparent border-t-gray-900"></div>
+                                    <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
                                 </div>
                             )}
                         </div>
@@ -251,15 +291,15 @@ const Dashboard = ({ data, year, setYear, years }) => {
             {/* ─── Sección: Saldos a Favor y Cuentas por Cobrar ─── */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 {/* Saldos a Favor */}
-                <div className="relative overflow-hidden rounded-2xl border border-emerald-200/60 bg-gradient-to-br from-emerald-50 via-white to-teal-50 p-6 shadow-sm hover:shadow-lg transition-all duration-300 group">
-                    <div className="absolute -top-8 -right-8 w-32 h-32 bg-emerald-100/40 rounded-full blur-2xl group-hover:bg-emerald-200/50 transition-all duration-500"></div>
+                <div className="relative overflow-hidden rounded-2xl border border-emerald-200/60 dark:border-emerald-900/50 bg-gradient-to-br from-emerald-50 via-white to-teal-50 dark:from-gray-800 dark:via-gray-800 dark:to-emerald-900/20 p-6 shadow-sm hover:shadow-lg transition-all duration-300 group">
+                    <div className="absolute -top-8 -right-8 w-32 h-32 bg-emerald-100/40 dark:bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-200/50 dark:group-hover:bg-emerald-500/20 transition-all duration-500"></div>
                     <div className="relative z-10">
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="p-3 rounded-xl bg-emerald-100 shadow-sm">
-                                <TrendingUp size={22} className="text-emerald-600" />
+                            <div className="p-3 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 shadow-sm">
+                                <TrendingUp size={22} className="text-emerald-600 dark:text-emerald-400" />
                             </div>
                             <div>
-                                <h3 className="text-xs font-black text-emerald-600 uppercase tracking-widest">Saldos a Favor</h3>
+                                <h3 className="text-xs font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Saldos a Favor</h3>
                                 <p className="text-[10px] text-emerald-400 font-medium mt-0.5">Procesos con saldo positivo a favor</p>
                             </div>
                         </div>
@@ -283,15 +323,15 @@ const Dashboard = ({ data, year, setYear, years }) => {
                 </div>
 
                 {/* Cuentas por Cobrar */}
-                <div className="relative overflow-hidden rounded-2xl border border-rose-200/60 bg-gradient-to-br from-rose-50 via-white to-pink-50 p-6 shadow-sm hover:shadow-lg transition-all duration-300 group">
-                    <div className="absolute -top-8 -right-8 w-32 h-32 bg-rose-100/40 rounded-full blur-2xl group-hover:bg-rose-200/50 transition-all duration-500"></div>
+                <div className="relative overflow-hidden rounded-2xl border border-rose-200/60 dark:border-rose-900/50 bg-gradient-to-br from-rose-50 via-white to-pink-50 dark:from-gray-800 dark:via-gray-800 dark:to-rose-900/20 p-6 shadow-sm hover:shadow-lg transition-all duration-300 group">
+                    <div className="absolute -top-8 -right-8 w-32 h-32 bg-rose-100/40 dark:bg-rose-500/10 rounded-full blur-2xl group-hover:bg-rose-200/50 dark:group-hover:bg-rose-500/20 transition-all duration-500"></div>
                     <div className="relative z-10">
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="p-3 rounded-xl bg-rose-100 shadow-sm">
-                                <TrendingDown size={22} className="text-rose-600" />
+                            <div className="p-3 rounded-xl bg-rose-100 dark:bg-rose-900/50 shadow-sm">
+                                <TrendingDown size={22} className="text-rose-600 dark:text-rose-400" />
                             </div>
                             <div>
-                                <h3 className="text-xs font-black text-rose-600 uppercase tracking-widest">Cuentas por Cobrar</h3>
+                                <h3 className="text-xs font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest">Cuentas por Cobrar</h3>
                                 <p className="text-[10px] text-rose-400 font-medium mt-0.5">Procesos con cobros pendientes</p>
                             </div>
                         </div>
@@ -315,9 +355,74 @@ const Dashboard = ({ data, year, setYear, years }) => {
                 </div>
             </div>
 
+            {/* ─── Fila Analítica: Progreso y Top Contratistas ─── */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                {/* Indicador de Avance Financiero */}
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col justify-center">
+                    <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-6 flex items-center gap-2 uppercase tracking-widest">
+                        <TrendingUp size={18} className="text-blue-500" /> Avance de Pagos
+                    </h3>
+                    
+                    <div className="flex-1 flex flex-col justify-center items-center">
+                        <div className="relative w-40 h-40">
+                            {/* Círculo de fondo */}
+                            <svg className="w-full h-full transform -rotate-90">
+                                <circle cx="80" cy="80" r="70" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-gray-100 dark:text-gray-700" />
+                                {/* Círculo de progreso */}
+                                <circle 
+                                    cx="80" cy="80" r="70" 
+                                    stroke="currentColor" 
+                                    strokeWidth="12" 
+                                    fill="transparent" 
+                                    strokeDasharray={`${2 * Math.PI * 70}`}
+                                    strokeDashoffset={`${2 * Math.PI * 70 * (1 - (eficiencia.porcentajePagado / 100))}`}
+                                    strokeLinecap="round"
+                                    className="text-blue-500 transition-all duration-1000 ease-out" 
+                                />
+                            </svg>
+                            <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                <span className="text-3xl font-black text-gray-900 dark:text-white">{eficiencia.porcentajePagado.toFixed(1)}%</span>
+                                <span className="text-[10px] text-gray-500 font-bold uppercase">Ejecutado</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Top 5 Contratistas */}
+                <div className="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2 uppercase tracking-widest">
+                        <Building2 size={18} className="text-emerald-500" /> Top Contratistas por Valor Adjudicado
+                    </h3>
+                    <div className="space-y-4 mt-6">
+                        {topContratistas.length === 0 ? (
+                            <div className="text-center text-gray-400 dark:text-gray-500 text-sm py-4">No hay datos de contratistas</div>
+                        ) : (
+                            topContratistas.map((c, i) => (
+                                <div key={i} className="flex items-center gap-4">
+                                    <div className="w-6 font-black text-gray-300 dark:text-gray-600 text-lg">#{i+1}</div>
+                                    <div className="flex-1">
+                                        <div className="flex justify-between items-end mb-1">
+                                            <span className="text-sm font-bold text-gray-800 dark:text-gray-200 truncate pr-2 max-w-[60%]">{c.name}</span>
+                                            <span className="text-sm font-mono font-black text-emerald-600 dark:text-emerald-400">{fmtCurrency(c.valor)}</span>
+                                        </div>
+                                        <div className="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden">
+                                            <div 
+                                                className="bg-emerald-500 h-1.5 rounded-full" 
+                                                style={{ width: `${(c.valor / topContratistas[0].valor) * 100}%` }}
+                                            ></div>
+                                        </div>
+                                        <div className="text-[10px] text-gray-400 mt-1">{c.procesos} {c.procesos === 1 ? 'proceso' : 'procesos'}</div>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2 bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
+                <div className="lg:col-span-2 bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-6 flex items-center gap-2">
                         <LineChart size={20} className="text-blue-500" /> Ejecución Financiera por Mes
                     </h3>
                     <div className="h-[350px] w-full">
@@ -333,8 +438,8 @@ const Dashboard = ({ data, year, setYear, years }) => {
                     </div>
                 </div>
 
-                <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-bold text-gray-800 mb-6 font-display">Estado de Procesos</h3>
+                <div className="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-6 font-display">Estado de Procesos</h3>
                     <div className="h-[300px] w-full relative">
                         {mainData.length > 0 ? (
                             <ResponsiveContainer width="100%" height="100%">
@@ -363,8 +468,8 @@ const Dashboard = ({ data, year, setYear, years }) => {
                 </div>
 
                 {/* Gráfico de Modalidades */}
-                <div className="lg:col-span-3 bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
+                <div className="lg:col-span-3 bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-6 flex items-center gap-2">
                         <Building2 size={20} className="text-purple-500" /> Distribución por Modalidad de Selección
                     </h3>
                     <div className="h-[350px] w-full">

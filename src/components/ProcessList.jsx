@@ -54,30 +54,30 @@ const ProcessList = ({ data, onEdit, onDelete, userRole = 'radicador' }) => {
     }, [estadoCounts]);
 
     return (
-        <div className="card mt-8 overflow-hidden">
+        <div className="card mt-8 overflow-hidden bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
             {/* ── Header con filtros ── */}
-            <div className="p-5 pb-4 border-b border-gray-100">
+            <div className="p-5 pb-4 border-b border-gray-100 dark:border-gray-700">
                 <div className="flex justify-between items-center mb-3">
-                    <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                    <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
                         <Filter size={18} className="text-blue-500" /> Listado de Procesos
                     </h2>
-                    <span className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-xs font-bold">
+                    <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-3 py-1 rounded-full text-xs font-bold">
                         {filteredData.length} de {data.length}
                     </span>
                 </div>
 
                 {/* Búsqueda */}
                 <div className="relative mb-3">
-                    <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                     <input
                         type="text"
                         value={searchText}
                         onChange={(e) => setSearchText(e.target.value)}
                         placeholder="Buscar por N° proceso, contratista, objeto o supervisor..."
-                        className="w-full pl-9 pr-9 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all bg-gray-50/80 hover:bg-white"
+                        className="w-full pl-9 pr-9 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 dark:focus:ring-blue-900 transition-all bg-gray-50/80 dark:bg-gray-900/50 hover:bg-white dark:hover:bg-gray-800"
                     />
                     {searchText && (
-                        <button onClick={() => setSearchText('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                        <button onClick={() => setSearchText('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                             <X size={15} />
                         </button>
                     )}
@@ -115,21 +115,21 @@ const ProcessList = ({ data, onEdit, onDelete, userRole = 'radicador' }) => {
             </div>
 
             {/* ── Tabla ── */}
-            <div className="w-full">
-                <table className="w-full text-left border-collapse table-fixed">
+            <div className="w-full overflow-x-auto">
+                <table className="w-full text-left border-collapse table-fixed min-w-[1000px]">
                     <thead>
-                        <tr className="bg-gradient-to-r from-slate-50 to-gray-50">
-                            <th className="pl-4 pr-2 py-3 w-[15%] text-[10px] font-bold text-gray-400 uppercase tracking-wider">N° Proceso</th>
-                            <th className="px-2 py-3 w-[27%] text-[10px] font-bold text-gray-400 uppercase tracking-wider">Objeto / Contratista</th>
-                            <th className="px-2 py-3 w-[10%] text-[10px] font-bold text-gray-400 uppercase tracking-wider text-right">Valor Total</th>
-                            <th className="px-2 py-3 w-[10%] text-[10px] font-bold text-gray-400 uppercase tracking-wider text-right">Pagado</th>
-                            <th className="px-2 py-3 w-[10%] text-[10px] font-bold text-gray-400 uppercase tracking-wider text-right">Saldo</th>
-                            <th className="px-2 py-3 w-[11%] text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">Estado</th>
-                            <th className="px-1 py-3 w-[7%] text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">SECOP</th>
-                            <th className="px-1 py-3 w-[10%] text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">Acciones</th>
+                        <tr className="bg-gradient-to-r from-slate-50 to-gray-50 dark:from-gray-800 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700">
+                            <th className="pl-4 pr-2 py-3 w-[15%] text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">N° Proceso</th>
+                            <th className="px-2 py-3 w-[27%] text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Objeto / Contratista</th>
+                            <th className="px-2 py-3 w-[10%] text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider text-right">Valor Total</th>
+                            <th className="px-2 py-3 w-[10%] text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider text-right">Pagado</th>
+                            <th className="px-2 py-3 w-[10%] text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider text-right">Saldo</th>
+                            <th className="px-2 py-3 w-[11%] text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider text-center">Estado</th>
+                            <th className="px-1 py-3 w-[7%] text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider text-center">SECOP</th>
+                            <th className="px-1 py-3 w-[10%] text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider text-center">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-50">
+                    <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
                         {filteredData.length === 0 ? (
                             <tr>
                                 <td colSpan="8" className="px-6 py-12 text-center text-gray-400 italic text-sm">
@@ -146,34 +146,34 @@ const ProcessList = ({ data, onEdit, onDelete, userRole = 'radicador' }) => {
                                 const st = getEstadoStyle(estado);
 
                                 return (
-                                    <tr key={item.id} className="hover:bg-blue-50/30 transition-colors duration-100 group">
+                                    <tr key={item.id} className="transition-all duration-200 group relative hover:z-10 hover:bg-white dark:hover:bg-gray-700 hover:shadow-[0_4px_20px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
                                         {/* N° Proceso */}
                                         <td className="pl-4 pr-2 py-2.5">
-                                            <span className="font-mono text-[11px] text-blue-600 font-semibold block truncate" title={item['NUMERO DE PROCESO'] || 'N/A'}>
+                                            <span className="font-mono text-[11px] text-blue-600 dark:text-blue-400 font-semibold block truncate" title={item['NUMERO DE PROCESO'] || 'N/A'}>
                                                 {item['NUMERO DE PROCESO'] || 'N/A'}
                                             </span>
                                         </td>
 
                                         {/* Objeto / Contratista */}
                                         <td className="px-2 py-2.5">
-                                            <div className="truncate font-medium text-gray-800 text-[11px] leading-tight" title={item['OBJETO']}>
+                                            <div className="truncate font-medium text-gray-800 dark:text-gray-200 text-[11px] leading-tight" title={item['OBJETO']}>
                                                 {item['OBJETO'] || 'Sin objeto'}
                                             </div>
-                                            <div className="truncate text-[10px] text-gray-400 leading-tight mt-0.5" title={item['CONTRATISTA']}>
+                                            <div className="truncate text-[10px] text-gray-400 dark:text-gray-500 leading-tight mt-0.5" title={item['CONTRATISTA']}>
                                                 {item['CONTRATISTA'] || 'Sin contratista'}
                                             </div>
                                         </td>
 
                                         {/* Valor Total */}
                                         <td className="px-2 py-2.5 text-right">
-                                            <span className="font-mono text-[11px] font-semibold text-gray-800 truncate block" title={fmt(tC)}>
+                                            <span className="font-mono text-[11px] font-semibold text-gray-800 dark:text-gray-200 truncate block" title={fmt(tC)}>
                                                 {fmt(tC)}
                                             </span>
                                         </td>
 
                                         {/* Total Pagado */}
                                         <td className="px-2 py-2.5 text-right">
-                                            <span className="font-mono text-[11px] font-medium text-emerald-600 truncate block" title={fmt(tP)}>
+                                            <span className="font-mono text-[11px] font-medium text-emerald-600 dark:text-emerald-400 truncate block" title={fmt(tP)}>
                                                 {fmt(tP)}
                                             </span>
                                         </td>
@@ -227,15 +227,15 @@ const ProcessList = ({ data, onEdit, onDelete, userRole = 'radicador' }) => {
 
                                         {/* Acciones */}
                                         <td className="px-1 py-2.5 text-center">
-                                            <div className="flex justify-center gap-0.5">
-                                                <button onClick={() => setSelectedProcess(item)} className="p-1 text-emerald-500 hover:bg-emerald-50 rounded-md transition-colors" title="Ver Detalle">
+                                            <div className="flex justify-center gap-0.5 opacity-60 group-hover:opacity-100 transition-opacity">
+                                                <button onClick={() => setSelectedProcess(item)} className="p-1 text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded-md transition-colors" title="Ver Detalle">
                                                     <Eye size={15} />
                                                 </button>
-                                                <button onClick={() => onEdit(item)} className="p-1 text-blue-500 hover:bg-blue-50 rounded-md transition-colors" title="Editar">
+                                                <button onClick={() => onEdit(item)} className="p-1 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md transition-colors" title="Editar">
                                                     <Edit size={15} />
                                                 </button>
                                                 {userRole === 'admin' && (
-                                                    <button onClick={() => onDelete(item.id)} className="p-1 text-red-400 hover:bg-red-50 rounded-md transition-colors" title="Eliminar">
+                                                    <button onClick={() => onDelete(item.id)} className="p-1 text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors" title="Eliminar">
                                                         <Trash2 size={15} />
                                                     </button>
                                                 )}
