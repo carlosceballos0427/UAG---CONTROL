@@ -4,7 +4,7 @@ import {
     PieChart, Pie, Cell, Legend,
     BarChart, Bar
 } from 'recharts';
-import { LayoutDashboard, Clock, DollarSign, Wallet, Building2, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { LayoutDashboard, Clock, DollarSign, Wallet, Building2, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Calendar } from 'lucide-react';
 
 /** Formatea valores monetarios con 2 decimales */
 const fmtCurrency = (val) => `$ ${new Intl.NumberFormat('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(val || 0)}`;
@@ -232,7 +232,19 @@ const Dashboard = ({ data, year, setYear, years }) => {
             <header className="dashboard-header mb-8 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                 <div>
                     <h1 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white tracking-tight">Resumen Ejecutivo</h1>
-                    <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm md:text-base">Análisis de ejecución financiera y contractual — Año {year}</p>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm md:text-base">Análisis de ejecución financiera y contractual</p>
+                </div>
+                <div className="year-selector bg-white/80 dark:bg-gray-800/80 backdrop-blur-md p-1.5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex gap-1 self-start md:self-auto overflow-x-auto max-w-full">
+                    {years && years.map(y => (
+                        <button
+                            key={y}
+                            className={`px-5 py-2.5 rounded-xl text-sm font-black transition-all duration-300 flex items-center gap-2 whitespace-nowrap ${year === y ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/30 scale-105' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'}`}
+                            onClick={() => setYear(y)}
+                        >
+                            {year === y && <Calendar size={16} />}
+                            {y}
+                        </button>
+                    ))}
                 </div>
             </header>
 

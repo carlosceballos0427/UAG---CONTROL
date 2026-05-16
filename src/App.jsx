@@ -5,15 +5,15 @@ import ProcessList from './components/ProcessList'
 import Settings from './components/Settings'
 import ErrorBoundary from './components/ErrorBoundary'
 import { getStoredData, deleteEntry, getStoredYears, saveStoredYears, getStoredDependencias, saveDependencias } from './utils/storage'
-import { Settings as SettingsIcon, Eye, EyeOff, Moon, Sun, Menu, X } from 'lucide-react'
+import { Settings as SettingsIcon, Eye, EyeOff, Moon, Sun, Menu, X, Calendar } from 'lucide-react'
 import './styles/App.css'
 
 const API_BASE = '/api';
 
 function App() {
     const [activeTab, setActiveTab] = useState('dashboard')
-    const [years, setYears] = useState(['2025', '2026'])
-    const [year, setYear] = useState('2025')
+    const [years, setYears] = useState(['2026', '2025'])
+    const [year, setYear] = useState('2026')
     const [data, setData] = useState([])
     const [editingProcess, setEditingProcess] = useState(null)
     const [dependencias, setDependencias] = useState([])
@@ -105,10 +105,14 @@ function App() {
 
     useEffect(() => {
         const storedYears = getStoredYears();
-        setYears(storedYears);
-        if (storedYears.length > 0 && !storedYears.includes(year)) {
-            setYear(storedYears[0]);
-        }
+        let defaultYears = storedYears && storedYears.length > 0 ? storedYears : ['2026', '2025'];
+        
+        // Sort descending to get the most recent year
+        const sortedYears = [...defaultYears].sort((a, b) => parseInt(b) - parseInt(a));
+        
+        setYears(sortedYears);
+        setYear(sortedYears[0]);
+        
         setDependencias(getStoredDependencias());
     }, [])
 
@@ -148,10 +152,11 @@ function App() {
     }
 
     const handleYearsChange = (newYears) => {
-        setYears(newYears);
-        saveStoredYears(newYears);
-        if (!newYears.includes(year)) {
-            setYear(newYears[0]);
+        const sortedYears = [...newYears].sort((a, b) => parseInt(b) - parseInt(a));
+        setYears(sortedYears);
+        saveStoredYears(sortedYears);
+        if (!sortedYears.includes(year)) {
+            setYear(sortedYears[0]);
         }
     }
 
@@ -326,13 +331,16 @@ function App() {
                                     <h1 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white tracking-tight">Seguimiento de Contratos</h1>
                                     <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm md:text-base">Gestión integral de la ejecución financiera — UAG Control</p>
                                 </div>
-                                <div className="year-selector bg-white dark:bg-gray-800 p-1 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex gap-1 self-start md:self-auto overflow-x-auto max-w-full">
+                                <div className="year-selector bg-white/80 dark:bg-gray-800/80 backdrop-blur-md p-1.5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex gap-1 self-start md:self-auto overflow-x-auto max-w-full">
                                     {years.map(y => (
                                         <button
                                             key={y}
-                                            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${year === y ? 'bg-blue-600 text-white shadow-md shadow-blue-200 dark:shadow-blue-900/50' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+                                            className={`px-5 py-2.5 rounded-xl text-sm font-black transition-all duration-300 flex items-center gap-2 whitespace-nowrap ${year === y ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/30 scale-105' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'}`}
                                             onClick={() => setYear(y)}
-                                        >{y}</button>
+                                        >
+                                            {year === y && <Calendar size={16} />}
+                                            {y}
+                                        </button>
                                     ))}
                                 </div>
                             </header>
