@@ -31,20 +31,48 @@ const parseColNumber = (str) => {
 /**
  * @component CurrencyInput
  * Input de texto que muestra el valor con separadores de miles colombianos.
- * Al escribir, solo acepta dígitos y formatea en tiempo real.
+ * Al escribir, se muestra sin formato para facilitar edición, y formatea al salir.
  */
 const CurrencyInput = ({ value, onChange, className = '', placeholder = '0,00' }) => {
+    const [displayValue, setDisplayValue] = useState(formatColNumber(value));
+    const [isFocused, setIsFocused] = useState(false);
+
+    useEffect(() => {
+        if (!isFocused) {
+            setDisplayValue(formatColNumber(value));
+        }
+    }, [value, isFocused]);
+
     const handleChange = (e) => {
-        // Allow digits, dots (thousands) and comma (decimal)
         let raw = e.target.value.replace(/[^\d.,]/g, '');
+        setDisplayValue(raw);
         onChange(parseColNumber(raw));
     };
+
+    const handleBlur = () => {
+        setIsFocused(false);
+        setDisplayValue(formatColNumber(value));
+    };
+
+    const handleFocus = () => {
+        setIsFocused(true);
+        const num = typeof value === 'string' ? parseColNumber(value) : value;
+        if (num) {
+            const cleanStr = num.toString().replace('.', ',');
+            setDisplayValue(cleanStr);
+        } else {
+            setDisplayValue('');
+        }
+    };
+
     return (
         <input
             type="text"
             inputMode="decimal"
-            value={formatColNumber(value)}
+            value={isFocused ? displayValue : formatColNumber(value)}
             onChange={handleChange}
+            onBlur={handleBlur}
+            onFocus={handleFocus}
             className={className}
             placeholder={placeholder}
         />
