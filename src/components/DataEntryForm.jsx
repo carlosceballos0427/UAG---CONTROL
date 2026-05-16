@@ -224,8 +224,8 @@ const DataEntryForm = ({ editingProcess, onCancel, onSaved, initialYear, years, 
             {/* Encabezado */}
             <header className="form-header">
                 <div>
-                    <h1 className="text-2xl font-black text-gray-900">{editingProcess ? 'Editar Proceso' : 'Diligenciar Proceso'}</h1>
-                    <p className="text-gray-500 text-sm">UAG Control — Complete la información del contrato</p>
+                    <h1 className="text-2xl font-black text-gray-900 dark:text-white">{editingProcess ? 'Editar Proceso' : 'Diligenciar Proceso'}</h1>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm">UAG Control — Complete la información del contrato</p>
                 </div>
                 {!editingProcess && (
                     <div className="year-selector-mini">
