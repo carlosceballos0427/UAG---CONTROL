@@ -3,12 +3,22 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import Usuario, Proceso, Adicion, Pago
 from .serializers import UsuarioSerializer, ProcesoSerializer, AdicionSerializer, PagoSerializer
+from .permissions import IsAdminOrRadicadorOrReadOnly, IsAdminOrSelf
 
 class UsuarioViewSet(viewsets.ModelViewSet):
-    queryset = Usuario.objects.all()
+    queryset = Usuario.objects.none()
     serializer_class = UsuarioSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['email', 'username']
+    permission_classes = [IsAdminOrSelf]
+
+    def get_queryset(self):
+        user = self.request.user
+        if not user.is_authenticated:
+            return Usuario.objects.none()
+        if user.rol == 'admin':
+            return Usuario.objects.all()
+        return Usuario.objects.filter(id=user.id)
 
     @action(detail=False, methods=['post'])
     def change_password(self, request):
@@ -37,6 +47,7 @@ class UsuarioViewSet(viewsets.ModelViewSet):
 
 class ProcesoViewSet(viewsets.ModelViewSet):
     serializer_class = ProcesoSerializer
+    permission_classes = [IsAdminOrRadicadorOrReadOnly]
 
     def get_queryset(self):
         queryset = Proceso.objects.all()
@@ -54,7 +65,9 @@ class ProcesoViewSet(viewsets.ModelViewSet):
 class AdicionViewSet(viewsets.ModelViewSet):
     queryset = Adicion.objects.all()
     serializer_class = AdicionSerializer
+    permission_classes = [IsAdminOrRadicadorOrReadOnly]
 
 class PagoViewSet(viewsets.ModelViewSet):
     queryset = Pago.objects.all()
     serializer_class = PagoSerializer
+    permission_classes = [IsAdminOrRadicadorOrReadOnly]

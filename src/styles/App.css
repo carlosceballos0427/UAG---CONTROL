@@ -420,3 +420,224 @@ tr:hover {
         grid-template-columns: 1fr;
     }
 }
+
+/* ==================== PREMIUM LOGIN SCREEN & SIDEBAR LOGO ==================== */
+
+.login-page-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(-45deg, #022c22, #0f172a, #115e59, #0f172a, #065f46);
+    background-size: 400% 400%;
+    animation: gradientMesh 15s ease infinite;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+@keyframes gradientMesh {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Glassmorphism Card with entrance animation */
+.login-card {
+    background: rgba(255, 255, 255, 0.76);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: 2rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 440px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.login-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.3);
+}
+
+.dark .login-card {
+    background: rgba(15, 23, 42, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* Styled login logos and headers */
+.login-logo-wrapper {
+    width: 150px;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Centered horizontally within the card */
+    margin: 0 auto 1.5rem auto;
+}
+
+/* High-res PNG with transparent bg */
+.login-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    /* Subtle drop shadow so the shield pops on the glass card */
+    filter: drop-shadow(0 8px 16px rgba(30, 80, 160, 0.2));
+}
+
+
+.login-header-pretitle {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #047857; /* Emerald-700 */
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+}
+
+.dark .login-header-pretitle {
+    color: #34d399; /* Emerald-400 */
+}
+
+.login-header-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 0.2rem;
+    line-height: 1.3;
+}
+
+.dark .login-header-title {
+    color: #f8fafc;
+}
+
+.login-header-subtitle {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 2rem;
+}
+
+.dark .login-header-subtitle {
+    color: #94a3b8;
+}
+
+/* Premium input styling */
+.login-input {
+    width: 100%;
+    padding: 0.85rem 1.1rem;
+    background: rgba(248, 250, 252, 0.9);
+    border: 1.5px solid #e2e8f0;
+    border-radius: 0.85rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #1e293b;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark .login-input {
+    background: rgba(30, 41, 59, 0.6);
+    border-color: rgba(71, 85, 105, 0.6);
+    color: #f8fafc;
+}
+
+.login-input:focus {
+    outline: none;
+    border-color: #059669; /* Emerald-600 */
+    background: white;
+    box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.12);
+}
+
+.dark .login-input:focus {
+    background: rgba(15, 23, 42, 0.85);
+    border-color: #34d399; /* Emerald-400 */
+    box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.15);
+}
+
+.login-button {
+    width: 100%;
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    color: white;
+    font-weight: 800;
+    font-size: 0.95rem;
+    padding: 0.95rem;
+    border-radius: 0.85rem;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 10px 20px -5px rgba(4, 120, 87, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.login-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 24px -5px rgba(4, 120, 87, 0.45);
+    background: linear-gradient(135deg, #065f46 0%, #047857 100%);
+}
+
+.login-button:active {
+    transform: translateY(0);
+}
+
+/* Sidebar Logo alignment */
+.sidebar-logo-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-logo-wrapper {
+    width: 48px;
+    height: 48px;
+    /* No background, no border — shield floats on the dark sidebar */
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-logo-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    /* Subtle brightness boost so it pops against dark bg */
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4)) brightness(1.05);
+    transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+.sidebar-logo-wrapper:hover .sidebar-logo-image {
+    filter: drop-shadow(0 3px 10px rgba(255,215,0,0.3)) brightness(1.1);
+    transform: scale(1.08);
+}
+
+
+/* Mobile Header Logo styling */
+.mobile-logo-wrapper {
+    width: 40px;
+    height: 40px;
+    /* No background, no border */
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mobile-logo-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 1px 4px rgba(0,0,0,0.4)) brightness(1.05);
+}

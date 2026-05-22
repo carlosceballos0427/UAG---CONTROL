@@ -6,6 +6,8 @@ import Settings from './components/Settings'
 import ErrorBoundary from './components/ErrorBoundary'
 import { getStoredData, deleteEntry, getStoredYears, saveStoredYears, getStoredDependencias, saveDependencias } from './utils/storage'
 import { Settings as SettingsIcon, Eye, EyeOff, Moon, Sun, Menu, X, Calendar } from 'lucide-react'
+import logoAlcaldia from './assets/logo_alcaldia.png'
+import logoHacienda from './assets/logo_hacienda.png'
 import './styles/App.css'
 
 const API_BASE = '/api';
@@ -171,53 +173,62 @@ function App() {
 
     if (!user) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
-                <div className="bg-white p-10 rounded-3xl shadow-xl w-full max-w-md text-center border border-gray-100">
-                    <div className="mb-8">
-                        <div className="text-4xl font-black text-blue-600 tracking-widest leading-none mb-1">UAG</div>
-                        <div className="text-sm font-bold text-blue-300 tracking-[0.2em] uppercase">Control</div>
+            <div className="login-page-container">
+                <div className="login-card">
+                    <div className="login-logo-wrapper">
+                        <img src={logoAlcaldia} alt="Alcaldía de Cali" className="login-logo" />
                     </div>
-                    <h1 className="text-2xl font-bold text-gray-800 mb-2">Bienvenido</h1>
-                    <p className="text-gray-500 mb-8 text-sm">Inicia sesión con tu cuenta para acceder a la plataforma.</p>
+                    
+                    <div className="login-header-pretitle">Alcaldía de Santiago de Cali</div>
+                    <div className="login-header-title">Departamento Administrativo de Hacienda</div>
+                    <div className="login-header-subtitle">Control Contractual (UAG)</div>
                     
                     <form onSubmit={handleLogin} className="flex flex-col gap-4">
-                        <input
-                            type="text"
-                            placeholder="Nombre de Usuario"
-                            value={loginUsername}
-                            onChange={(e) => setLoginUsername(e.target.value)}
-                            className="p-3 border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            required
-                        />
-                        <div className="relative">
+                        <div className="text-left">
+                            <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider block mb-1.5 pl-1">Usuario</label>
                             <input
-                                type={showPassword ? "text" : "password"}
-                                placeholder="Contraseña"
-                                value={loginPassword}
-                                onChange={(e) => setLoginPassword(e.target.value)}
-                                className="w-full p-3 pr-12 border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                                type="text"
+                                placeholder="Ingresa tu usuario"
+                                value={loginUsername}
+                                onChange={(e) => setLoginUsername(e.target.value)}
+                                className="login-input"
                                 required
                             />
-                            <button
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 transition-colors bg-transparent border-none outline-none"
-                                title={showPassword ? "Ocultar contraseña" : "Ver contraseña"}
-                            >
-                                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                            </button>
                         </div>
+                        
+                        <div className="text-left">
+                            <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider block mb-1.5 pl-1">Contraseña</label>
+                            <div className="relative">
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    placeholder="Ingresa tu contraseña"
+                                    value={loginPassword}
+                                    onChange={(e) => setLoginPassword(e.target.value)}
+                                    className="login-input pr-12"
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-emerald-600 transition-colors bg-transparent border-none outline-none"
+                                    title={showPassword ? "Ocultar contraseña" : "Ver contraseña"}
+                                >
+                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
+                            </div>
+                        </div>
+
                         {loginError && (
-                            <div className="bg-red-50 border-l-4 border-red-500 p-3 rounded-r-lg mt-1 text-left shadow-sm animate-fade-in">
-                                <p className="text-red-700 text-sm font-medium">{loginError}</p>
+                            <div className="bg-red-50 dark:bg-red-950/30 border-l-4 border-red-500 p-3 rounded-r-lg mt-1 text-left shadow-sm animate-fade-in">
+                                <p className="text-red-700 dark:text-red-400 text-xs font-semibold">{loginError}</p>
                             </div>
                         )}
                         
                         <button
                             type="submit"
-                            className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all mt-2"
+                            className="login-button mt-4"
                         >
-                            Ingresar
+                            Ingresar al Sistema
                         </button>
                     </form>
                 </div>
@@ -229,9 +240,14 @@ function App() {
         <div className="app-container">
             <aside className={`sidebar ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
                 {/* Logo / Nombre de la app */}
-                <div className="logo mb-10">
-                    <div className="text-xl font-black text-white tracking-widest leading-none">UAG</div>
-                    <div className="text-xs font-bold text-blue-300 tracking-[0.2em] uppercase">Control</div>
+                <div className="sidebar-logo-container">
+                    <div className="sidebar-logo-wrapper">
+                        <img src={logoAlcaldia} alt="Logo Alcaldía" className="sidebar-logo-image" />
+                    </div>
+                    <div>
+                        <div className="text-lg font-black text-white tracking-widest leading-none">UAG</div>
+                        <div className="text-[10px] font-bold text-emerald-400 tracking-[0.2em] uppercase">Control</div>
+                    </div>
                 </div>
                 <nav className="flex flex-col gap-2">
                     {isMobileMenuOpen && (
@@ -253,16 +269,18 @@ function App() {
                     >
                         <span className="text-lg">📋</span> Listado
                     </button>
-                    <button
-                        className={`nav-item ${activeTab === 'entry' ? 'active' : ''}`}
-                        onClick={() => {
-                            setEditingProcess(null);
-                            setActiveTab('entry');
-                            setIsMobileMenuOpen(false);
-                        }}
-                    >
-                        <span className="text-lg">✍️</span> {editingProcess ? 'Editar' : 'Diligenciar'}
-                    </button>
+                    {user?.rol !== 'visualizador' && (
+                        <button
+                            className={`nav-item ${activeTab === 'entry' ? 'active' : ''}`}
+                            onClick={() => {
+                                setEditingProcess(null);
+                                setActiveTab('entry');
+                                setIsMobileMenuOpen(false);
+                            }}
+                        >
+                            <span className="text-lg">✍️</span> {editingProcess ? 'Editar' : 'Diligenciar'}
+                        </button>
+                    )}
                     <div className="mt-auto pt-10">
                         {/* Dark Mode Toggle */}
                         <button
@@ -307,8 +325,13 @@ function App() {
                 {/* Header Móvil */}
                 <div className="md:hidden flex justify-between items-center mb-6 bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
                     <div className="flex items-center gap-2">
-                        <div className="text-xl font-black text-blue-600 dark:text-blue-400 tracking-widest leading-none">UAG</div>
-                        <div className="text-xs font-bold text-gray-400 tracking-[0.2em] uppercase">Control</div>
+                        <div className="mobile-logo-wrapper">
+                            <img src={logoAlcaldia} alt="Alcaldía" className="mobile-logo-image" />
+                        </div>
+                        <div>
+                            <div className="text-base font-black text-blue-600 dark:text-blue-400 tracking-widest leading-none">UAG</div>
+                            <div className="text-[9px] font-bold text-gray-400 tracking-[0.2em] uppercase">Control</div>
+                        </div>
                     </div>
                     <button 
                         onClick={() => setIsMobileMenuOpen(true)}

@@ -227,6 +227,7 @@ const Settings = ({ years, onYearsChange, data, year, onDataImported, dependenci
                     </p>
 
                     {/* Import */}
+                    {currentUser?.rol !== 'visualizador' && (
                     <div className="mb-8">
                         <h4 className="text-sm font-bold text-gray-600 uppercase tracking-wide mb-3">Importar desde Excel</h4>
                         <div className="flex items-center gap-4">
@@ -253,6 +254,7 @@ const Settings = ({ years, onYearsChange, data, year, onDataImported, dependenci
                             </div>
                         )}
                     </div>
+                    )}
 
                     {/* Export */}
                     <div>
@@ -310,6 +312,7 @@ const Settings = ({ years, onYearsChange, data, year, onDataImported, dependenci
                         >
                             <option value="radicador">Radicador</option>
                             <option value="admin">Administrador</option>
+                            <option value="visualizador">Visualizador</option>
                         </select>
                         <button
                             onClick={handleCreateUser}
@@ -387,6 +390,7 @@ const Settings = ({ years, onYearsChange, data, year, onDataImported, dependenci
                     </p>
 
                     {/* Agregar nueva */}
+                    {currentUser?.rol !== 'visualizador' && (
                     <div className="flex gap-3 mb-6">
                         <input
                             type="text"
@@ -403,6 +407,7 @@ const Settings = ({ years, onYearsChange, data, year, onDataImported, dependenci
                             <Plus size={18} /> Agregar
                         </button>
                     </div>
+                    )}
 
                     {/* Lista de dependencias */}
                     <div className="space-y-2">
@@ -412,6 +417,7 @@ const Settings = ({ years, onYearsChange, data, year, onDataImported, dependenci
                                     <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-black">{i + 1}</div>
                                     <span className="text-sm font-medium text-gray-700">{dep}</span>
                                 </div>
+                                {currentUser?.rol !== 'visualizador' && (
                                 <button
                                     onClick={() => handleRemoveDependencia(dep)}
                                     className="text-red-400 hover:text-red-600 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -419,6 +425,7 @@ const Settings = ({ years, onYearsChange, data, year, onDataImported, dependenci
                                 >
                                     <Trash2 size={16} />
                                 </button>
+                                )}
                             </div>
                         ))}
                         {dependencias.length === 0 && (
@@ -440,6 +447,7 @@ const Settings = ({ years, onYearsChange, data, year, onDataImported, dependenci
                     <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2 mb-6">
                         <Calendar size={20} className="text-blue-500" /> Gestión de Años
                     </h3>
+                    {currentUser?.rol !== 'visualizador' && (
                     <div className="flex gap-3 mb-8">
                         <input
                             type="number"
@@ -452,13 +460,16 @@ const Settings = ({ years, onYearsChange, data, year, onDataImported, dependenci
                             <Plus size={20} /> Agregar Año
                         </button>
                     </div>
+                    )}
                     <div className="space-y-3">
                         {years.map(y => (
                             <div key={y} className="flex justify-between items-center bg-gray-50 p-4 rounded-2xl border border-gray-100 group hover:bg-white hover:shadow-sm transition-all">
                                 <span className="text-xl font-black text-gray-700">{y}</span>
+                                {currentUser?.rol !== 'visualizador' && (
                                 <button onClick={() => handleRemoveYear(y)} className="text-red-400 hover:text-red-600 p-2 opacity-0 group-hover:opacity-100 transition-opacity" title="Eliminar año">
                                     <Trash2 size={20} />
                                 </button>
+                                )}
                             </div>
                         ))}
                     </div>
@@ -471,8 +482,9 @@ const Settings = ({ years, onYearsChange, data, year, onDataImported, dependenci
                         <div>
                             <h4 className="font-bold text-blue-900">Nota sobre el almacenamiento</h4>
                             <p className="text-sm text-blue-700/80 mt-1 leading-relaxed">
-                                Los datos se guardan localmente en su navegador (LocalStorage).
-                                Use la opción de exportar para mantener copias de seguridad.
+                                Los datos de contratos, pagos y adiciones se almacenan centralmente en la base de datos del servidor.
+                                La configuración de años y dependencias se almacena localmente en su navegador (LocalStorage).
+                                Le recomendamos usar las opciones de exportación para realizar respaldos periódicos de la información.
                             </p>
                         </div>
                     </div>

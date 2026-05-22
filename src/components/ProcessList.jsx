@@ -231,9 +231,11 @@ const ProcessList = ({ data, onEdit, onDelete, userRole = 'radicador' }) => {
                                                 <button onClick={() => setSelectedProcess(item)} className="p-1 text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded-md transition-colors" title="Ver Detalle">
                                                     <Eye size={15} />
                                                 </button>
-                                                <button onClick={() => onEdit(item)} className="p-1 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md transition-colors" title="Editar">
-                                                    <Edit size={15} />
-                                                </button>
+                                                {userRole !== 'visualizador' && (
+                                                    <button onClick={() => onEdit(item)} className="p-1 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md transition-colors" title="Editar">
+                                                        <Edit size={15} />
+                                                    </button>
+                                                )}
                                                 {userRole === 'admin' && (
                                                     <button onClick={() => onDelete(item.id)} className="p-1 text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors" title="Eliminar">
                                                         <Trash2 size={15} />
