@@ -1,7 +1,10 @@
 {
-    "python.defaultInterpreterPath": "f:\\APP-SEGUIMIENTO CONTRACTUAL\\UAG---CONTROL-main\\backend\\venv\\Scripts\\python.exe",
+    "python.defaultInterpreterPath": "${workspaceFolder}\\backend\\venv\\Scripts\\python.exe",
     "python.analysis.extraPaths": [
-        "f:\\APP-SEGUIMIENTO CONTRACTUAL\\UAG---CONTROL-main\\backend"
+        "${workspaceFolder}\\backend",
+        "${workspaceFolder}\\backend\\venv\\Lib\\site-packages"
     ],
-    "git.path": "C:\\Program Files\\Git\\cmd\\git.exe"
+    "python.terminal.activateEnvironment": true,
+    "python.languageServer": "Pylance",
+    "python.analysis.typeCheckingMode": "basic"
 }

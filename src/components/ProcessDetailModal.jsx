@@ -50,9 +50,10 @@ const ProcessDetailModal = ({ process, onClose }) => {
                             <div className={`font-bold text-sm px-2 py-0.5 rounded-md inline-block ${process.ESTADO === 'TERMINADO' ? 'bg-emerald-100 text-emerald-700' :
                                 process.ESTADO === 'EN PROCESO' ? 'bg-blue-100 text-blue-700' :
                                     process.ESTADO === 'EN EJECUCIÓN' ? 'bg-indigo-100 text-indigo-700' :
-                                        process.ESTADO === 'LIQUIDADO' ? 'bg-gray-200 text-gray-700' :
-                                            process.ESTADO === 'SUSPENDIDO' ? 'bg-red-100 text-red-700' :
-                                                'bg-yellow-100 text-yellow-700'
+                                        process.ESTADO === 'EN TRÁMITE DE LIQUIDACIÓN' ? 'bg-teal-100 text-teal-700' :
+                                            process.ESTADO === 'LIQUIDADO' ? 'bg-gray-200 text-gray-700' :
+                                                process.ESTADO === 'SUSPENDIDO' ? 'bg-red-100 text-red-700' :
+                                                    'bg-yellow-100 text-yellow-700'
                                 }`}>
                                 {process['ESTADO']}
                             </div>

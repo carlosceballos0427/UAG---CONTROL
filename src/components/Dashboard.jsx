@@ -84,6 +84,7 @@ const Dashboard = ({ data, year, setYear, years }) => {
         const pendientes = mainData.filter(d => d.ESTADO === 'PENDIENTE' || !d.ESTADO).length;
         const terminados = mainData.filter(d => d.ESTADO === 'TERMINADO').length;
         const liquidados = mainData.filter(d => d.ESTADO === 'LIQUIDADO').length;
+        const tramiteLiquidacion = mainData.filter(d => d.ESTADO === 'EN TRÁMITE DE LIQUIDACIÓN').length;
         const suspendidos = mainData.filter(d => d.ESTADO === 'SUSPENDIDO').length;
         const emitidos = mainData.filter(d => d.ESTADO === 'EMITIDO').length;
 
@@ -102,7 +103,7 @@ const Dashboard = ({ data, year, setYear, years }) => {
         return [
             {
                 label: 'Procesos Totales', value: totalProcesos, icon: <LayoutDashboard size={20} />, color: '#6366f1',
-                tooltip: `Pendientes: ${pendientes} | En Proceso: ${enProceso} | En Ejecución: ${enEjecucion} | Terminados: ${terminados} | Liquidados: ${liquidados} | Suspendidos: ${suspendidos} | Emitidos: ${emitidos}`
+                tooltip: `Pendientes: ${pendientes} | En Proceso: ${enProceso} | En Ejecución: ${enEjecucion} | Terminados: ${terminados} | Liquidados: ${liquidados} | En Trámite de Liq.: ${tramiteLiquidacion} | Suspendidos: ${suspendidos} | Emitidos: ${emitidos}`
             },
             {
                 label: 'Presupuesto Estimado', value: fmtCurrency(presupuestoTotal), icon: <DollarSign size={20} />, color: '#8b5cf6',

@@ -524,6 +524,7 @@ const DataEntryForm = ({ editingProcess, onCancel, onSaved, initialYear, years, 
                                 <option value="EN PROCESO">EN PROCESO</option>
                                 <option value="EN EJECUCIÓN">EN EJECUCIÓN</option>
                                 <option value="TERMINADO">TERMINADO</option>
+                                <option value="EN TRÁMITE DE LIQUIDACIÓN">EN TRÁMITE DE LIQUIDACIÓN</option>
                                 <option value="LIQUIDADO">LIQUIDADO</option>
                                 <option value="SUSPENDIDO">SUSPENDIDO</option>
                                 <option value="EMPRÉSTITO">EMPRÉSTITO</option>

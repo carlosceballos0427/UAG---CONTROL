@@ -13,6 +13,7 @@ const ESTADO_STYLES = {
     'TERMINADO':    { bg: 'bg-green-100',   text: 'text-green-700',   dot: 'bg-green-500' },
     'EN PROCESO':   { bg: 'bg-blue-100',    text: 'text-blue-700',    dot: 'bg-blue-500' },
     'EN EJECUCIÓN': { bg: 'bg-indigo-100',  text: 'text-indigo-700',  dot: 'bg-indigo-500' },
+    'EN TRÁMITE DE LIQUIDACIÓN': { bg: 'bg-teal-100', text: 'text-teal-700', dot: 'bg-teal-500' },
     'LIQUIDADO':    { bg: 'bg-gray-200',    text: 'text-gray-700',    dot: 'bg-gray-500' },
     'EMPRÉSTITO':   { bg: 'bg-purple-100',  text: 'text-purple-700',  dot: 'bg-purple-500' },
     'SUSPENDIDO':   { bg: 'bg-red-100',     text: 'text-red-700',     dot: 'bg-red-500' },
@@ -50,7 +51,7 @@ const ProcessList = ({ data, onEdit, onDelete, userRole = 'radicador' }) => {
     }, [data, filterEstado, searchText]);
 
     const estadosPresentes = useMemo(() => {
-        return ['PENDIENTE', 'EN PROCESO', 'EN EJECUCIÓN', 'TERMINADO', 'LIQUIDADO', 'SUSPENDIDO', 'EMPRÉSTITO', 'EMITIDO'].filter(e => estadoCounts[e] > 0);
+        return ['PENDIENTE', 'EN PROCESO', 'EN EJECUCIÓN', 'TERMINADO', 'EN TRÁMITE DE LIQUIDACIÓN', 'LIQUIDADO', 'SUSPENDIDO', 'EMPRÉSTITO', 'EMITIDO'].filter(e => estadoCounts[e] > 0);
     }, [estadoCounts]);
 
     return (
