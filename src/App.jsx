@@ -5,7 +5,7 @@ import ProcessList from './components/ProcessList'
 import Settings from './components/Settings'
 import ErrorBoundary from './components/ErrorBoundary'
 import { getStoredData, deleteEntry, getStoredYears, saveStoredYears, getStoredDependencias, saveDependencias } from './utils/storage'
-import { Settings as SettingsIcon, Eye, EyeOff, Moon, Sun, Menu, X, Calendar } from 'lucide-react'
+import { Settings as SettingsIcon, Eye, EyeOff, Moon, Sun, Menu, X, Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
 import logoAlcaldia from './assets/logo_alcaldia.png'
 import logoHacienda from './assets/logo_hacienda.png'
 import './styles/App.css'
@@ -35,6 +35,16 @@ function App() {
         return false;
     });
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('uag_sidebar_collapsed') === 'true';
+        }
+        return false;
+    });
+
+    useEffect(() => {
+        localStorage.setItem('uag_sidebar_collapsed', isSidebarCollapsed);
+    }, [isSidebarCollapsed]);
 
     useEffect(() => {
         if (isDarkMode) {
@@ -237,18 +247,26 @@ function App() {
     }
 
     return (
-        <div className="app-container">
-            <aside className={`sidebar ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
+        <div className={`app-container ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+            <aside className={`sidebar ${isMobileMenuOpen ? 'mobile-open' : ''} ${isSidebarCollapsed ? 'collapsed' : ''}`}>
                 {/* Logo / Nombre de la app */}
                 <div className="sidebar-logo-container">
                     <div className="sidebar-logo-wrapper">
                         <img src={logoAlcaldia} alt="Logo Alcaldía" className="sidebar-logo-image" />
                     </div>
-                    <div>
+                    <div className={`sidebar-logo-text ${isSidebarCollapsed ? 'hidden' : ''}`}>
                         <div className="text-lg font-black text-white tracking-widest leading-none">UAG</div>
                         <div className="text-[10px] font-bold text-emerald-400 tracking-[0.2em] uppercase">Control</div>
                     </div>
                 </div>
+                {/* Toggle collapse button */}
+                <button
+                    className="sidebar-toggle-btn"
+                    onClick={() => setIsSidebarCollapsed(prev => !prev)}
+                    title={isSidebarCollapsed ? 'Expandir menú' : 'Colapsar menú'}
+                >
+                    {isSidebarCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+                </button>
                 <nav className="flex flex-col gap-2">
                     {isMobileMenuOpen && (
                         <div className="flex justify-end md:hidden mb-4">
@@ -260,14 +278,18 @@ function App() {
                     <button
                         className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
                         onClick={() => { setActiveTab('dashboard'); setIsMobileMenuOpen(false); }}
+                        title={isSidebarCollapsed ? 'Dashboard' : ''}
                     >
-                        <span className="text-lg">📊</span> Dashboard
+                        <span className="nav-icon">📊</span>
+                        <span className={`nav-label ${isSidebarCollapsed ? 'hidden' : ''}`}>Dashboard</span>
                     </button>
                     <button
                         className={`nav-item ${activeTab === 'list' ? 'active' : ''}`}
                         onClick={() => { setActiveTab('list'); setIsMobileMenuOpen(false); }}
+                        title={isSidebarCollapsed ? 'Listado' : ''}
                     >
-                        <span className="text-lg">📋</span> Listado
+                        <span className="nav-icon">📋</span>
+                        <span className={`nav-label ${isSidebarCollapsed ? 'hidden' : ''}`}>Listado</span>
                     </button>
                     {user?.rol !== 'visualizador' && (
                         <button
@@ -277,8 +299,10 @@ function App() {
                                 setActiveTab('entry');
                                 setIsMobileMenuOpen(false);
                             }}
+                            title={isSidebarCollapsed ? (editingProcess ? 'Editar' : 'Diligenciar') : ''}
                         >
-                            <span className="text-lg">✍️</span> {editingProcess ? 'Editar' : 'Diligenciar'}
+                            <span className="nav-icon">✍️</span>
+                            <span className={`nav-label ${isSidebarCollapsed ? 'hidden' : ''}`}>{editingProcess ? 'Editar' : 'Diligenciar'}</span>
                         </button>
                     )}
                     <div className="mt-auto pt-10">
@@ -286,28 +310,33 @@ function App() {
                         <button
                             className="nav-item w-full mb-2"
                             onClick={() => setIsDarkMode(!isDarkMode)}
+                            title={isSidebarCollapsed ? (isDarkMode ? 'Modo Claro' : 'Modo Oscuro') : ''}
                         >
                             {isDarkMode ? <Sun size={18} className="text-yellow-400" /> : <Moon size={18} />}
-                            {isDarkMode ? 'Modo Claro' : 'Modo Oscuro'}
+                            <span className={`nav-label ${isSidebarCollapsed ? 'hidden' : ''}`}>{isDarkMode ? 'Modo Claro' : 'Modo Oscuro'}</span>
                         </button>
 
                         <button
                             className={`nav-item w-full ${activeTab === 'settings' ? 'active' : ''}`}
                             onClick={() => { setActiveTab('settings'); setIsMobileMenuOpen(false); }}
+                            title={isSidebarCollapsed ? 'Configuración' : ''}
                         >
-                            <SettingsIcon size={18} /> Configuración
+                            <SettingsIcon size={18} />
+                            <span className={`nav-label ${isSidebarCollapsed ? 'hidden' : ''}`}>Configuración</span>
                         </button>
 
                         <div className="my-4 border-t border-gray-200/20 dark:border-gray-700/50"></div>
-                        <div className="px-3 mb-2">
+                        <div className={`px-3 mb-2 ${isSidebarCollapsed ? 'hidden' : ''}`}>
                             <div className="text-xs text-gray-400 font-bold truncate">{user?.email}</div>
                             <div className="text-[10px] text-blue-400 font-bold uppercase mt-0.5">{user?.rol || 'radicador'}</div>
                         </div>
                         <button
                             className="nav-item w-full text-red-400 hover:text-red-300 hover:bg-red-500/10"
                             onClick={handleLogout}
+                            title={isSidebarCollapsed ? 'Cerrar Sesión' : ''}
                         >
-                            Cerrar Sesión
+                            <span className="nav-icon text-lg">🚪</span>
+                            <span className={`nav-label ${isSidebarCollapsed ? 'hidden' : ''}`}>Cerrar Sesión</span>
                         </button>
                     </div>
                 </nav>

@@ -83,17 +83,17 @@ export const getStoredData = async (year) => {
             'OBJETO': p.objeto || '',
             'MODALIDAD': p.modalidad || '',
             'TIPO DE CONTRATO': p.tipo_contrato || '',
-            'PRESUPUESTO ESTIMADO': p.presupuesto_estimado || 0,
-            'VALOR ADJUDICADO': p.valor_adjudicado || 0,
-            'CDP': p.cdp || 0,
+            'PRESUPUESTO ESTIMADO': parseFloat(p.presupuesto_estimado) || 0,
+            'VALOR ADJUDICADO': parseFloat(p.valor_adjudicado) || 0,
+            'CDP': parseFloat(p.cdp) || 0,
             'ESTADO': p.estado || 'PENDIENTE',
             'TIPO_SALDO': p.tipo_saldo || '',
             'SUPERVISOR': p.supervisor || '',
             'APOYO A LA SUPERVISIÓN': p.apoyo_supervision || '',
             'CONTRATISTA': p.contratista || '',
             'LINK_SECOP': p.link_secop || '',
-            'ADICIONES': p.adiciones?.map(a => ({ id: a.id, descripcion: a.descripcion, valor: a.valor })) || [],
-            'PAGOS': p.pagos?.map(pg => ({ id: pg.id, periodo: pg.periodo, fecha: pg.fecha, valor: pg.valor })) || [],
+            'ADICIONES': p.adiciones?.map(a => ({ id: a.id, descripcion: a.descripcion, valor: parseFloat(a.valor) || 0 })) || [],
+            'PAGOS': p.pagos?.map(pg => ({ id: pg.id, periodo: pg.periodo, fecha: pg.fecha, valor: parseFloat(pg.valor) || 0 })) || [],
             'CREADO_POR': p.creado_por_detail?.email || ''
         }));
     } catch (e) {
