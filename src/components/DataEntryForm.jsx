@@ -9,7 +9,7 @@
  */
 import { useState, useEffect, useRef } from 'react';
 import { addEntry, updateEntry } from '../utils/storage';
-import { Save, Info, CreditCard, ShieldCheck, Plus, Trash2, Wallet, Building2, User, ExternalLink, TrendingUp, TrendingDown } from 'lucide-react';
+import { Save, Info, CreditCard, ShieldCheck, Plus, Trash2, Wallet, Building2, User, ExternalLink, TrendingUp, TrendingDown, CheckCircle } from 'lucide-react';
 
 // ─── Utilidades de formateo monetario ─────────────────────────────
 
@@ -359,17 +359,17 @@ const DataEntryForm = ({ editingProcess, onCancel, onSaved, initialYear, years, 
                         </label>
                         <p className="text-[11px] text-gray-400 mb-4">Indique si el saldo resultante es a favor de la entidad o si corresponde a cuentas por cobrar.</p>
                         <div className="flex gap-3">
-                            {/* Sin clasificar */}
+                            {/* Pagado en Totalidad */}
                             <button
                                 type="button"
                                 onClick={() => setFormData(prev => ({ ...prev, 'TIPO_SALDO': '' }))}
-                                className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all duration-200 border-2 ${
+                                className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all duration-200 border-2 flex items-center justify-center gap-2 ${
                                     formData['TIPO_SALDO'] === ''
-                                        ? 'border-gray-400 bg-gray-100 text-gray-700 shadow-md'
-                                        : 'border-gray-200 bg-white text-gray-400 hover:border-gray-300 hover:bg-gray-50'
+                                        ? 'border-blue-500 bg-blue-50 text-blue-700 shadow-md shadow-blue-100 ring-2 ring-blue-200'
+                                        : 'border-gray-200 bg-white text-gray-400 hover:border-blue-300 hover:bg-blue-50/30'
                                 }`}
                             >
-                                Sin clasificar
+                                <CheckCircle size={16} /> Pagado en Totalidad
                             </button>
                             {/* Saldo a Favor */}
                             <button

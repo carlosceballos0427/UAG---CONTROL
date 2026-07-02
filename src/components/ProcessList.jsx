@@ -194,6 +194,11 @@ const ProcessList = ({ data, onEdit, onDelete, userRole = 'radicador' }) => {
                                                     <span className="w-1 h-1 rounded-full bg-rose-500"></span>CxC
                                                 </span>
                                             )}
+                                            {(!item['TIPO_SALDO'] || item['TIPO_SALDO'] === '') && (
+                                                <span className="inline-flex items-center gap-0.5 mt-0.5 px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-600 text-[8px] font-bold uppercase tracking-wide">
+                                                    <span className="w-1 h-1 rounded-full bg-blue-500"></span>Pagado
+                                                </span>
+                                            )}
                                         </td>
 
                                         {/* Estado */}

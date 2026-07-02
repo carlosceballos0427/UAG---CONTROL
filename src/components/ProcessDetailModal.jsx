@@ -93,6 +93,11 @@ const ProcessDetailModal = ({ process, onClose }) => {
                                         <span className="text-[11px] font-bold text-rose-700 uppercase tracking-wide">Cuentas por Cobrar</span>
                                     </div>
                                 )}
+                                {(!process['TIPO_SALDO'] || process['TIPO_SALDO'] === '') && (
+                                    <div className="inline-flex items-center gap-1.5 mt-2 px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-200">
+                                        <span className="text-[11px] font-bold text-blue-700 uppercase tracking-wide">Pagado en Totalidad</span>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </section>
