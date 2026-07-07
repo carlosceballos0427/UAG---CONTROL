@@ -40,6 +40,19 @@ Todo el código debe quedar documentado en español:
 - **Cada línea/expresión compleja** (querysets, cálculos financieros, transformaciones de Excel, hooks) → comentario explicativo.
 - **Bloques de HTML/CSS/JSX** → comentario de sección describiendo su propósito.
 
+## Flujo de trabajo y entornos — IMPORTANTE
+
+- La **copia de trabajo principal** vive en el servidor local de la Alcaldía (se trabaja
+  allí directamente o por Escritorio Remoto). Hay un espejo secundario en el equipo
+  personal (WSL/Ubuntu). **GitHub es el puente**: hacer `git pull` SIEMPRE al empezar
+  y `git push` al terminar, en cualquiera de los dos entornos.
+- La **base de datos real** (`backend/db.sqlite3` del servidor) contiene información
+  confidencial de contratos públicos: **NUNCA debe subirse a git** (el `.gitignore` ya
+  ignora `*.sqlite3` — no quitar esa regla). Las copias locales usan datos de prueba.
+  Existe `backend/backup_db.bat` para respaldos: correrlo antes de operaciones riesgosas.
+- **Red de la Alcaldía**: bloquea HTTP plano (puerto 80) pero deja pasar HTTPS. Si una
+  instalación o descarga falla con 403, usar fuentes HTTPS.
+
 ## Contexto adicional
 
 - Datos financieros de contratos públicos: cuidado extremo con cálculos de montos,
