@@ -1,0 +1,19 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "uag-frontend",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 5173,
+      "autoPort": true
+    },
+    {
+      "name": "uag-backend",
+      "runtimeExecutable": "backend/.venv/bin/python",
+      "runtimeArgs": ["backend/manage.py", "runserver"],
+      "port": 8000,
+      "autoPort": true
+    }
+  ]
+}
